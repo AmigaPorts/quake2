@@ -558,7 +558,10 @@ void R_DrawMTexBuffer(void)
 		} 
 	}
 
+#ifndef __amigaos4__
 	mglDrawMultitexBuffer(src, dst, GL_REPLACE);
+//TODO!
+#endif
 }
 
 #endif
@@ -817,7 +820,7 @@ void R_RenderBrushPoly (msurface_t *fa)
 		{
 			GL_Bind( image->texnum );
 
-    			if(!r_vertexlighting->value)
+				if(!r_vertexlighting->value)
 			GL_TexEnv( GL_REPLACE );
 		} 
 		#else
@@ -944,7 +947,7 @@ void R_DrawAlphaSurfaces (void)
 	// 
 	// go back to the world matrix 
 	// 
-    qglLoadMatrixf (r_world_matrix); 
+	qglLoadMatrixf (r_world_matrix); 
  
 	qglEnable (GL_BLEND); 
 	GL_TexEnv( GL_MODULATE ); 
@@ -1404,7 +1407,7 @@ void R_DrawBrushModel (entity_t *e)
 		modelorg[2] = DotProduct (temp, up); 
 	} 
  
-    qglPushMatrix (); 
+	qglPushMatrix (); 
 e->angles[0] = -e->angles[0];   // stupid quake bug 
 e->angles[2] = -e->angles[2];   // stupid quake bug 
 	R_RotateForEntity (e); 
@@ -1993,40 +1996,40 @@ extern cvar_t *gl_keeptjunctions;
 
   if (!gl_keeptjunctions->value)
   {
-    for (i = 0 ; i < lnumverts ; ++i)
-    {
-      vec3_t v1, v2;
-      float *prev, *this, *next;
-      float f;
+	for (i = 0 ; i < lnumverts ; ++i)
+	{
+	  vec3_t v1, v2;
+	  float *prev, *this, *next;
+	  float f;
 
-      prev = poly->verts[(i + lnumverts - 1) % lnumverts];
-      this = poly->verts[i];
-      next = poly->verts[(i + 1) % lnumverts];
+	  prev = poly->verts[(i + lnumverts - 1) % lnumverts];
+	  this = poly->verts[i];
+	  next = poly->verts[(i + 1) % lnumverts];
 
-      VectorSubtract( this, prev, v1 );
-      VectorNormalize( v1 );
-      VectorSubtract( next, prev, v2 );
-      VectorNormalize( v2 );
+	  VectorSubtract( this, prev, v1 );
+	  VectorNormalize( v1 );
+	  VectorSubtract( next, prev, v2 );
+	  VectorNormalize( v2 );
 
-      // skip co-linear points
-      #define COLINEAR_EPSILON 0.001
-      if ((fabs( v1[0] - v2[0] ) <= COLINEAR_EPSILON) &&
-        (fabs( v1[1] - v2[1] ) <= COLINEAR_EPSILON) && 
-        (fabs( v1[2] - v2[2] ) <= COLINEAR_EPSILON))
-      {
-        int j;
-        for (j = i + 1; j < lnumverts; ++j)
-        {
-          int k;
-          for (k = 0; k < VERTEXSIZE; ++k)
-            poly->verts[j - 1][k] = poly->verts[j][k];
-        }
-        --lnumverts;
-        ++nColinElim;
-        // retry next vertex next time, which is now current vertex
-        --i;
-      }
-    }
+	  // skip co-linear points
+	  #define COLINEAR_EPSILON 0.001
+	  if ((fabs( v1[0] - v2[0] ) <= COLINEAR_EPSILON) &&
+		(fabs( v1[1] - v2[1] ) <= COLINEAR_EPSILON) && 
+		(fabs( v1[2] - v2[2] ) <= COLINEAR_EPSILON))
+	  {
+		int j;
+		for (j = i + 1; j < lnumverts; ++j)
+		{
+		  int k;
+		  for (k = 0; k < VERTEXSIZE; ++k)
+			poly->verts[j - 1][k] = poly->verts[j][k];
+		}
+		--lnumverts;
+		++nColinElim;
+		// retry next vertex next time, which is now current vertex
+		--i;
+	  }
+	}
   }
   poly->numverts = lnumverts;
 

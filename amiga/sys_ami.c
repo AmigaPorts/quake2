@@ -60,8 +60,10 @@ static void * game_library = NULL;
 
 void	Sys_UnloadGame (void)
 {
+#ifndef __amigaos4__
   if(game_library) dllFreeLibrary(game_library);
   game_library = NULL;
+#endif
 }
 
 void	*Sys_GetGameAPI (void *parms)
@@ -74,11 +76,13 @@ void	*Sys_GetGameAPI (void *parms)
 
 	void *(*GetGameAPI) (void *);
 
+#ifndef __amigaos4__
   strcpy(name,"game.dll");
 
 	if (game_library) Com_Error (ERR_FATAL, "Sys_GetGameAPI without Sys_UnloadingGame");
 
 	Com_Printf("------- Loading %s -------", "game.dll");
+#endif
 
   // now run through the search paths
   path = NULL;
@@ -91,8 +95,9 @@ void	*Sys_GetGameAPI (void *parms)
 
 		strcpy(libname,"game.dll");
 
-    game_library = dllLoadLibrary (libname, (char *)name);
-    if (game_library)
+#ifndef __amigaos4__
+	game_library = dllLoadLibrary (libname, (char *)name);
+	if (game_library)
 		{
  			Com_DPrintf ("LoadLibrary (%s)\n",name);
  			break;
@@ -101,7 +106,7 @@ void	*Sys_GetGameAPI (void *parms)
 
   if(!game_library)
   {
-      Sys_Error("Failed to load %s\n", name);
+	  Sys_Error("Failed to load %s\n", name);
   }
 
   Com_DPrintf ("LoadLibrary (%s)\n", libname);
@@ -112,6 +117,8 @@ void	*Sys_GetGameAPI (void *parms)
 		Sys_UnloadGame ();
  		return NULL;
 	}
+#endif
+
 	return GetGameAPI (parms);
 }
 
@@ -132,17 +139,17 @@ char *Sys_ConsoleInput (void)
   static flag=0;
 
   if (!dedicated || !dedicated->value)
-      return NULL;
+	  return NULL;
 
   if(!serverinput)
   {
-      serverinput=Open("CON:0/0/500/100/SERVER_INPUT/AUTO/CLOSE", MODE_OLDFILE);
-      atexit(Sys_CloseInput);
+	  serverinput=Open("CON:0/0/500/100/SERVER_INPUT/AUTO/CLOSE", MODE_OLDFILE);
+	  atexit(Sys_CloseInput);
   }
 
   while (1) {
-      if (WaitForChar(serverinput,0))     /* there is at least one key to get */
-      {
+	  if (WaitForChar(serverinput,0))     /* there is at least one key to get */
+	  {
 	  if (Read(serverinput,&ch,1)!=1)
 	  {
 	      fprintf(stderr,"read failed, huh? (%s)\n",strerror(errno));
@@ -175,8 +182,8 @@ char *Sys_ConsoleInput (void)
 		      }
 		  }
 	  }
-      }
-      else
+	  }
+	  else
 	  return NULL;    /* no more key events */
   }
   return NULL;
@@ -187,21 +194,21 @@ void	Sys_ConsoleOutput (char *string)
   char    text[256];
 
   if (!dedicated || !dedicated->value)
-      return;
+	  return;
 
   if (console_textlen)
   {
-      text[0] = '\r';
-      memset(text+1, ' ', console_textlen);
-      text[console_textlen+1] = '\r';
-      text[console_textlen+2] = 0;
-      write(1,text,console_textlen+2);
+	  text[0] = '\r';
+	  memset(text+1, ' ', console_textlen);
+	  text[console_textlen+1] = '\r';
+	  text[console_textlen+2] = 0;
+	  write(1,text,console_textlen+2);
   }
 
   write(1,string,strlen(string));
 
   if (console_textlen)
-      write(1,console_text,console_textlen);
+	  write(1,console_text,console_textlen);
 }
 
 extern struct Mode_Screen * (*GetModeScreen)();
@@ -216,22 +223,22 @@ void Sys_SendKeyEvents(void)
   struct IntuiMessage *imsg;
 
   if(!GetModeScreen)
-    return;
+	return;
 
   ms=GetModeScreen();
 
   do
   {
-    extern void IN_GetMouseMove(struct IntuiMessage *);
+	extern void IN_GetMouseMove(struct IntuiMessage *);
 
-    imsg=(struct IntuiMessage *)GetMsg((ms->video_window)->UserPort);
-    if (imsg)
-    {
+	imsg=(struct IntuiMessage *)GetMsg((ms->video_window)->UserPort);
+	if (imsg)
+	{
 	sys_msg_time=(imsg->Seconds-inittime)*1000+imsg->Micros/1000;
 	switch(imsg->Class)
 	{
 	    case IDCMP_RAWKEY:
-      if ((imsg->Code)&0x80)
+	  if ((imsg->Code)&0x80)
 		    Key_Event(MapKey((imsg->Code)&0x7f),false,sys_msg_time, ENCODEKEY(imsg->Code, imsg->Qualifier));
 		  else
 		    Key_Event(MapKey(imsg->Code),true,sys_msg_time, ENCODEKEY(imsg->Code, imsg->Qualifier));
@@ -264,7 +271,7 @@ void Sys_SendKeyEvents(void)
 	      break;
 	}
 	if (ms->video_window) ReplyMsg(imsg);
-    }
+	}
   } while(imsg);
   sys_frame_time=timeGetTime();
 }
@@ -280,8 +287,8 @@ char *Sys_GetClipboardData( void )
 
 static void CloseKeymap(void)
 {
-    if (KeymapBase) CloseLibrary(KeymapBase);
-    KeymapBase = 0;
+	if (KeymapBase) CloseLibrary(KeymapBase);
+	KeymapBase = 0;
 }
 
 void	Sys_Init (void)
@@ -295,29 +302,29 @@ void	Sys_Init (void)
 
 int amigaRawKeyConvert(int rawkey)
 {
-    struct InputEvent ie;
-    WORD res;
-    char cbuf[20];
+	struct InputEvent ie;
+	WORD res;
+	char cbuf[20];
 
-    UWORD code = rawkey&0xFF;
-    UWORD qual = (rawkey>>8)%0xFFFF;
-    if (!KeymapBase) return -1;
+	UWORD code = rawkey&0xFF;
+	UWORD qual = (rawkey>>8)%0xFFFF;
+	if (!KeymapBase) return -1;
 
-    switch(code)
-    {
-    case 61:
-    case 62:
-    case 63:
-    case 45:
-    case 46:
-    case 47:
-    case 29:
-    case 30:
-    case 31:
-    case 15:
-    case 60:
+	switch(code)
+	{
+	case 61:
+	case 62:
+	case 63:
+	case 45:
+	case 46:
+	case 47:
+	case 29:
+	case 30:
+	case 31:
+	case 15:
+	case 60:
 	return -1;
-    default:
+	default:
 	ie.ie_Class = IECLASS_RAWKEY;
 	ie.ie_SubClass = 0;
 	ie.ie_Code  = code;
@@ -333,7 +340,7 @@ int amigaRawKeyConvert(int rawkey)
 	{
 	    return cbuf[0];
 	}
-    }
+	}
 }
 
 
@@ -353,17 +360,17 @@ int main (int argc_, char **argv_)
 #endif
   if (cddir && argc < MAX_NUM_ARGVS - 3)
   {
-      int     i;
+	  int     i;
 
-      // don't override a cddir on the command line
-      for (i=0 ; i<argc ; i++)
+	  // don't override a cddir on the command line
+	  for (i=0 ; i<argc ; i++)
 	  if (!Q_strcasecmp(argv[i], "-cddir"))
 	      break;
-      if (i == argc)
-      {
+	  if (i == argc)
+	  {
 	  argv[argc++] = "-cddir";
 	  argv[argc++] = cddir;
-      }
+	  }
   }
 
 	Qcommon_Init (argc, argv);
@@ -371,19 +378,19 @@ int main (int argc_, char **argv_)
 
 	while (1)
 	{
-    if (dedicated && dedicated->value)
-    {
+	if (dedicated && dedicated->value)
+	{
 	   Sleep (1);
-    }
+	}
 
-    do
-    {
+	do
+	{
 	  	newtime = Sys_Milliseconds ();
 	  	time = newtime - oldtime;
-    } while (time < 1);
+	} while (time < 1);
 
 		Qcommon_Frame (time);
-    oldtime=newtime;
+	oldtime=newtime;
 	}
   return 1;
 }

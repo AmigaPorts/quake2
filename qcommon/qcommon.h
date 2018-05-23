@@ -133,7 +133,7 @@ void    MSG_ReadData (sizebuf_t *sb, void *buffer, int size);
 extern  qboolean                bigendien;
 #if defined(AMIGA) || defined(ENDIAN_INLINE)
 #ifdef __PPC__
-#include "amiga/endian.h"
+#include "../amiga/endian.h"
 #endif
 #else
 extern  short   BigShort (short l);

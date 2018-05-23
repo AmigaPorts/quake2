@@ -10,8 +10,8 @@ SRC = amiga/cd_amiga.c client/cl_cin.c client/cl_ents.c client/cl_fx.c client/cl
       client/snd_dma.c client/snd_mem.c client/snd_mix.c \
       amiga/snd_amiga.c server/sv_ccmds.c server/sv_ents.c server/sv_game.c \
       server/sv_init.c server/sv_main.c server/sv_send.c server/sv_user.c \
-      server/sv_world.c amiga/sys_amiga.c amiga/in_mouse.c amiga/vid_dll.c amiga/vid_menu.c \
-      amiga/in_joy.c amiga/in_psx.c amiga/in_pcjoy.c amiga/twfsound_cd.c
+      server/sv_world.c amiga/sys_amiga.c amiga/in_mouse.c amiga/vid_dll.c amiga/vid_menu.c #\
+      #amiga/in_joy.c amiga/in_psx.c amiga/in_pcjoy.c amiga/twfsound_cd.c
 
 
 OBJ = $(SRC:.c=.o)

@@ -1652,23 +1652,30 @@ CL_SendCommand
 */
 void CL_SendCommand (void)
 {
+//	  Com_Printf("1\n");
 	// get new key events
 	Sys_SendKeyEvents ();
+//	  Com_Printf("2\n");
 
 	// allow mice or other external controllers to add commands
 	IN_Commands ();
+//	  Com_Printf("3\n");
 
 	// process console commands
 	Cbuf_Execute ();
+//	  Com_Printf("4\n");
 
 	// fix any cheating cvars
 	CL_FixCvarCheats ();
+//	  Com_Printf("5\n");
 
 	// send intentions now
 	CL_SendCmd ();
+//	  Com_Printf("6\n");
 
 	// resend a connection request if necessary
 	CL_CheckForResend ();
+//	  Com_Printf("7\n");
 }
 
 
@@ -1788,51 +1795,51 @@ unsigned int id_logo_played = 0;
 
 void PlayIdLogo()
 {
-      char buffer[2048];
-      char buffer2[1024];
-      char soundlib[256];
+	  char buffer[2048];
+	  char buffer2[1024];
+	  char soundlib[256];
 	char str[] = "idlog.cin";
 
-      int system_result;
-      extern cvar_t *s_lib;
-      cvar_t *vid_gamma,*ahi_speed,*ahi_channels,*ahi_bits,*khz,*s_volume;
-      int ahi_speed_val=22,ahi_channels_val=2,ahi_bits_val=16,khz_val=22;
-      float gamma_val;
-      float volume_val;
+	  int system_result;
+	  extern cvar_t *s_lib;
+	  cvar_t *vid_gamma,*ahi_speed,*ahi_channels,*ahi_bits,*khz,*s_volume;
+	  int ahi_speed_val=22,ahi_channels_val=2,ahi_bits_val=16,khz_val=22;
+	  float gamma_val;
+	  float volume_val;
 
-      if (id_logo_played) return;
+	  if (id_logo_played) return;
 
-      id_logo_played = 1;
+	  id_logo_played = 1;
 
-      CDAudio_Stop();
+	  CDAudio_Stop();
 
-      ahi_speed=Cvar_Get("ahi_speed", "22", CVAR_ARCHIVE);
-      ahi_channels=Cvar_Get("ahi_channels", "2", CVAR_ARCHIVE);
-      ahi_bits=Cvar_Get("ahi_bits", "16", CVAR_ARCHIVE);
-      khz=Cvar_Get("s_khz", "22", CVAR_ARCHIVE);
-      s_lib=Cvar_Get("s_lib","paula",CVAR_ARCHIVE);
-      vid_gamma=Cvar_Get("vid_gamma","0.7",CVAR_ARCHIVE);
-      s_volume=Cvar_Get("s_volume","0.7",CVAR_ARCHIVE);
+	  ahi_speed=Cvar_Get("ahi_speed", "22", CVAR_ARCHIVE);
+	  ahi_channels=Cvar_Get("ahi_channels", "2", CVAR_ARCHIVE);
+	  ahi_bits=Cvar_Get("ahi_bits", "16", CVAR_ARCHIVE);
+	  khz=Cvar_Get("s_khz", "22", CVAR_ARCHIVE);
+	  s_lib=Cvar_Get("s_lib","paula",CVAR_ARCHIVE);
+	  vid_gamma=Cvar_Get("vid_gamma","0.7",CVAR_ARCHIVE);
+	  s_volume=Cvar_Get("s_volume","0.7",CVAR_ARCHIVE);
 
-      sprintf(buffer, "vidplay >nil: %s/video/", FS_Gamedir() );
+	  sprintf(buffer, "vidplay >nil: %s/video/", FS_Gamedir() );
 
-      if (ahi_speed) ahi_speed_val=ahi_speed->value;
-      if (ahi_channels) ahi_channels_val=ahi_channels->value;
-      if (ahi_bits) ahi_bits_val=ahi_bits->value;
-      if (khz) khz_val=khz->value;
-      if (vid_gamma) gamma_val=vid_gamma->value;
-      else gamma_val=0.7;
-      if (s_volume) volume_val=s_volume->value;
-      else volume_val=0.7;
-      if (s_lib) strncpy(soundlib,s_lib->string,256);
-      else strcpy(soundlib,"paula");
+	  if (ahi_speed) ahi_speed_val=ahi_speed->value;
+	  if (ahi_channels) ahi_channels_val=ahi_channels->value;
+	  if (ahi_bits) ahi_bits_val=ahi_bits->value;
+	  if (khz) khz_val=khz->value;
+	  if (vid_gamma) gamma_val=vid_gamma->value;
+	  else gamma_val=0.7;
+	  if (s_volume) volume_val=s_volume->value;
+	  else volume_val=0.7;
+	  if (s_lib) strncpy(soundlib,s_lib->string,256);
+	  else strcpy(soundlib,"paula");
 
-      sprintf(buffer2, "%s %s %i %i %i %i %f %f >nil:",str,soundlib,ahi_speed_val,ahi_channels_val,ahi_bits_val,khz_val,gamma_val,volume_val);
+	  sprintf(buffer2, "%s %s %i %i %i %i %f %f >nil:",str,soundlib,ahi_speed_val,ahi_channels_val,ahi_bits_val,khz_val,gamma_val,volume_val);
 
-      strcat(buffer,buffer2);
+	  strcat(buffer,buffer2);
 
-      S_Shutdown();
-      system_result=System(buffer,0);
+	  S_Shutdown();
+	  system_result=System(buffer,0);
 }
 
 #endif

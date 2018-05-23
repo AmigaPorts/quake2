@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <arpa/inet.h>
 #include <proto/socket.h>
-#include <amitcp/socketbasetags.h>
+//#include <amitcp/socketbasetags.h>
 
 
 netadr_t        net_local_adr;

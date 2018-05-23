@@ -21,6 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qcommon.h"
 #include <setjmp.h>
 
+#ifdef __amigaos4__
+//#include <proto/exec.h>
+#endif
+
 #define MAXPRINTMSG     4096
 
 #define MAX_NUM_ARGVS   50
@@ -141,6 +145,9 @@ void Com_Printf (char *fmt, ...)
 		if (logfile_active->value > 1)
 			fflush (logfile);               // force it to save every time
 	}
+#ifdef __amigaos4__
+//DebugPrintF("%s", msg);
+#endif
 }
 
 
@@ -155,15 +162,21 @@ void Com_DPrintf (char *fmt, ...)
 {
 	va_list         argptr;
 	char            msg[MAXPRINTMSG];
-		
+
+//#if 0
 	if (!developer || !developer->value)
 		return;                 // don't confuse non-developers with techie stuff...
+//#endif
 
 	va_start (argptr,fmt);
 	vsprintf (msg,fmt,argptr);
 	va_end (argptr);
 	
 	Com_Printf ("%s", msg);
+
+#ifdef __amigaos4__
+//DebugPrintF("%s", msg);
+#endif
 }
 
 
@@ -202,7 +215,7 @@ void Com_Error (int code, char *fmt, ...)
 	{
 		if (!do_not_show_error) Com_Printf ("********************\nERROR: %s\n********************\n", msg);
 		do_not_show_error=0;
-    SV_Shutdown (va("Server crashed: %s\n", msg), false);
+	SV_Shutdown (va("Server crashed: %s\n", msg), false);
 		CL_Drop ();
 		recursive = false;
 		longjmp (abortframe, -1);
@@ -407,7 +420,7 @@ void MSG_WriteDeltaUsercmd (sizebuf_t *buf, usercmd_t *from, usercmd_t *cmd)
 	if (cmd->impulse != from->impulse)
 		bits |= CM_IMPULSE;
 
-    MSG_WriteByte (buf, bits);
+	MSG_WriteByte (buf, bits);
 
 	if (bits & CM_ANGLE1)
 		MSG_WriteShort (buf, cmd->angles[0]);
@@ -428,7 +441,7 @@ void MSG_WriteDeltaUsercmd (sizebuf_t *buf, usercmd_t *from, usercmd_t *cmd)
 	if (bits & CM_IMPULSE)
 	    MSG_WriteByte (buf, cmd->impulse);
 
-    MSG_WriteByte (buf, cmd->msec);
+	MSG_WriteByte (buf, cmd->msec);
 	MSG_WriteByte (buf, cmd->lightlevel);
 }
 
@@ -1441,8 +1454,8 @@ void Qcommon_Init (int argc, char **argv)
 	//
 	// init commands and vars
 	//
-    Cmd_AddCommand ("z_stats", Z_Stats_f);
-    Cmd_AddCommand ("error", Com_Error_f);
+	Cmd_AddCommand ("z_stats", Z_Stats_f);
+	Cmd_AddCommand ("error", Com_Error_f);
 
 	host_speeds = Cvar_Get ("host_speeds", "0", 0);
 	log_stats = Cvar_Get ("log_stats", "0", 0);

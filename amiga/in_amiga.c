@@ -20,48 +20,59 @@ void IN_InitPsx();
 void IN_InitJoystick();
 void IN_ShutdownJoystick();
 
+#ifdef __amigaos4__
+void IN_Commands (void)
+{
+}
+#endif
+
 void IN_Init (void)
 {
-    psxused = 0;
-    only_pc = 0;
+	psxused = 0;
+	only_pc = 0;
 
-    joy_pc = Cvar_Get("joy_pc", "0", CVAR_ARCHIVE);
-    joy_psx = Cvar_Get("joy_psx", "0", CVAR_ARCHIVE);
+	joy_pc = Cvar_Get("joy_pc", "0", CVAR_ARCHIVE);
+	joy_psx = Cvar_Get("joy_psx", "0", CVAR_ARCHIVE);
 
-    Com_Printf("Initializing Mouse\n");
-    IN_InitMouse();
+	Com_Printf("Initializing Mouse\n");
+	IN_InitMouse();
 
-    if (joy_pc->value)
-    {
+#ifndef __amigaos4__
+	if (joy_pc->value)
+	{
 	only_pc = 1;
 	Com_Printf("Initializing Analog Joystick\n");
 	IN_InitPC();
 	return;
-    }
+	}
 
-    if (joy_psx->value)
-    {
+	if (joy_psx->value)
+	{
 	Com_Printf("Initializing PSX pad\n");
 	psxused = 1;
 	IN_InitPsx();
-    }
+	}
 
-    IN_InitJoy();
+	IN_InitJoy();
+	IN_StartupJoystick();
+#endif
 
-    IN_StartupMouse();
-    IN_StartupJoystick();
+	IN_StartupMouse();
 }
 
 void IN_Shutdown (void)
 {
-    IN_ShutdownMouse();
-    if (only_pc)
-    {
+	IN_ShutdownMouse();
+
+#ifndef __amigaos4__
+	if (only_pc)
+	{
 	IN_ShutdownPC();
 	return;
-    }
-    if (psxused) IN_ShutdownPsx();
-    IN_ShutdownJoystick();
+	}
+	if (psxused) IN_ShutdownPsx();
+	IN_ShutdownJoystick();
+#endif
 }
 
 void IN_Frame (void)
@@ -70,14 +81,17 @@ void IN_Frame (void)
 
 void IN_Move (usercmd_t *cmd)
 {
-    IN_MouseMove(cmd);
-    if (only_pc)
-    {
+	IN_MouseMove(cmd);
+	
+#ifndef __amigaos4__
+	if (only_pc)
+	{
 	IN_JoyMovePC(cmd);
 	return;
-    }
-    if (psxused) IN_JoyMovePsx(cmd);
-    IN_JoyMove(cmd);
+	}
+	if (psxused) IN_JoyMovePsx(cmd);
+	IN_JoyMove(cmd);
+#endif
 }
 
 void IN_Activate (qboolean active)

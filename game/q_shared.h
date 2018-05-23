@@ -231,7 +231,7 @@ int Q_strncasecmp (char *s1, char *s2, int n);
 
 //=============================================
 #if defined(AMIGA) && defined(ENDIAN_INLINE)
-#include "amiga/endian.h"
+#include "../amiga/endian.h"
 #else
 short   BigShort(short l);
 short   LittleShort(short l);

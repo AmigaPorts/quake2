@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <proto/dos.h>
+#include <proto/exec.h>
 #include "renderercache.h"
 #include "../ref_soft/r_local.h"
 
-#ifdef __PPC__
+#if defined (__PPC__) && !defined (__amigaos4__)
 #include <powerpc/powerpc_protos.h>
 #define ADDHEAD AddHeadPPC
 #define REMOVE  RemovePPC
@@ -32,135 +33,135 @@ char filename[32];
 
 static __inline void HARD_MaybeFreeSomeMembers(hard_cache *cache, int size)
 {
-    hard_node *member;
-    hard_node *node;
+	hard_node *member;
+	hard_node *node;
 
-    while (cache->currentsize + size > cache->maxsize)
-    {
+	while (cache->currentsize + size > cache->maxsize)
+	{
 				node=(hard_node *)REMTAIL((struct List *)&(cache->CacheList));
-        if (node) cache->currentsize -= node->size;
-        node->CacheNode.ln_Succ = NULL;
-        node->CacheNode.ln_Pred = NULL;
-        node->in_list = 0;
-        member = node;
-        if (member == NULL)
-        {
-            fprintf(stderr, "ERROR: Out of memory\n");
-            exit(10L);
-        }
-        cache->Swap(member->data, (int)(member-cache->cache_entries));
-        member->is_swapped = 1;
-    }
+		if (node) cache->currentsize -= node->size;
+		node->CacheNode.ln_Succ = NULL;
+		node->CacheNode.ln_Pred = NULL;
+		node->in_list = 0;
+		member = node;
+		if (member == NULL)
+		{
+			fprintf(stderr, "ERROR: Out of memory\n");
+			exit(10L);
+		}
+		cache->Swap(member->data, (int)(member-cache->cache_entries));
+		member->is_swapped = 1;
+	}
 }
 
 void HARD_AddMember(hard_cache *cache, int idnum, unsigned int size, void *data)
 {
-    hard_node *node;
+	hard_node *node;
 
-    if (!cache) return;
+	if (!cache) return;
 
-    node = &cache->cache_entries[idnum];
+	node = &cache->cache_entries[idnum];
 
-    if ((node->size == size) && (node->data == data)) return;
+	if ((node->size == size) && (node->data == data)) return;
 
-    node->is_swapped = 0;
-    node->size = size;
-    node->data = data;
+	node->is_swapped = 0;
+	node->size = size;
+	node->data = data;
 
-    HARD_MaybeFreeSomeMembers(cache, size);
-    if (node->in_list==0)
-    {
-      ADDHEAD((struct List *)&(cache->CacheList),&(node->CacheNode));
-    	cache->currentsize += node->size;
-      node->in_list = 1;
-    }
+	HARD_MaybeFreeSomeMembers(cache, size);
+	if (node->in_list==0)
+	{
+	  ADDHEAD((struct List *)&(cache->CacheList),&(node->CacheNode));
+		cache->currentsize += node->size;
+	  node->in_list = 1;
+	}
 }
 
 void HARD_RemoveMember(hard_cache *cache, int idnum)
 {
-    hard_node *node;
-    if (!cache) return;
-    node  = &cache->cache_entries[idnum];
+	hard_node *node;
+	if (!cache) return;
+	node  = &cache->cache_entries[idnum];
 		if ((node->CacheNode.ln_Succ != NULL) && (node->CacheNode.ln_Pred != NULL))
-    {
-      if (node) cache->currentsize -= node->size;
-      REMOVE(&(node->CacheNode));
-      node->CacheNode.ln_Succ = NULL;
-      node->CacheNode.ln_Pred = NULL;
-      node->in_list = 0;
-    }
-    node->data = NULL;
-    node->size = 0;
+	{
+	  if (node) cache->currentsize -= node->size;
+	  REMOVE(&(node->CacheNode));
+	  node->CacheNode.ln_Succ = NULL;
+	  node->CacheNode.ln_Pred = NULL;
+	  node->in_list = 0;
+	}
+	node->data = NULL;
+	node->size = 0;
 }
 
 void HARD_AccessMember(hard_cache *cache, int id)
 {
-    hard_node * node;
-    if (!cache) return;
-    node = &cache->cache_entries[id];
+	hard_node * node;
+	if (!cache) return;
+	node = &cache->cache_entries[id];
 
-    if (node->is_swapped)
-    {
-        HARD_MaybeFreeSomeMembers(cache, node->size);
-        cache->Reload(node->data, id);
-        node->is_swapped = 0;
-        if (node->in_list==0)
-        {
+	if (node->is_swapped)
+	{
+		HARD_MaybeFreeSomeMembers(cache, node->size);
+		cache->Reload(node->data, id);
+		node->is_swapped = 0;
+		if (node->in_list==0)
+		{
 					ADDHEAD((struct List *)&(cache->CacheList),&(node->CacheNode));
-        	cache->currentsize += node->size;
-          node->in_list = 1;
-        }
-    }
-    else
-    {
-        if ((hard_node *)cache->CacheList.mlh_Head != node)
-        {
-          if (node->CacheNode.ln_Succ != NULL)
+			cache->currentsize += node->size;
+		  node->in_list = 1;
+		}
+	}
+	else
+	{
+		if ((hard_node *)cache->CacheList.mlh_Head != node)
+		{
+		  if (node->CacheNode.ln_Succ != NULL)
 					{
-    				REMOVE(&(node->CacheNode));
-    				ADDHEAD((struct List *)&(cache->CacheList),&(node->CacheNode));
+					REMOVE(&(node->CacheNode));
+					ADDHEAD((struct List *)&(cache->CacheList),&(node->CacheNode));
 					}
-        }
-    }
+		}
+	}
 }
 
 hard_cache* HARD_CreateCache(unsigned int maxsize, unsigned int numentries, CacheFunc Swap, CacheFunc Reload)
 {
-    int size,i;
-    hard_cache *cache;
-    size = sizeof(hard_node)*numentries + sizeof(hard_cache);
+	int size,i;
+	hard_cache *cache;
+	size = sizeof(hard_node)*numentries + sizeof(hard_cache);
 
-    cache = malloc(size);
+	cache = malloc(size);
 
-    if (cache)
-    {
-        NEWLIST((struct List *)&(cache->CacheList));
-        cache->cache_entries = (hard_node *)(cache+1);
-        cache->maxsize = maxsize;
-        cache->currentsize = 0;
-        cache->Swap = Swap;
-        cache->Reload = Reload;
-        for (i=0; i<numentries; i++)
-        {
-            memset(&cache->cache_entries[i], 0, sizeof(hard_node));
-        }
-    }
-    return cache;
+	if (cache)
+	{
+		NEWLIST((struct List *)&(cache->CacheList));
+		cache->cache_entries = (hard_node *)(cache+1);
+		cache->maxsize = maxsize;
+		cache->currentsize = 0;
+		cache->Swap = Swap;
+		cache->Reload = Reload;
+		for (i=0; i<numentries; i++)
+		{
+			memset(&cache->cache_entries[i], 0, sizeof(hard_node));
+		}
+	}
+	return cache;
 }
 
 void HARD_DeleteCache(hard_cache *cache)
 {
-    if (!cache) return;
-    free(cache);
-    cache=0;	
+	if (!cache) return;
+	free(cache);
+	cache=0;	
 }
 
 void HARD_ResizeCache(hard_cache *cache, unsigned int newsize)
 {
-    if (!cache) return;
-    if (newsize < 1000000) return;
-    cache->maxsize = newsize;
-    HARD_MaybeFreeSomeMembers(cache, 0);
+	if (!cache) return;
+	if (newsize < 1000000) return;
+	cache->maxsize = newsize;
+	HARD_MaybeFreeSomeMembers(cache, 0);
 }
 
 struct soft_member *SOFT_AddMember(struct soft_cache *cache,unsigned long size,unsigned long id,unsigned long flags)
@@ -200,9 +201,9 @@ void SOFT_RemoveMember(struct soft_cache *cache,struct soft_member *member)
 
 	if((member->data)&&(member->flags&SOFT_FREE))
 	{
-    free(member->data);
+	free(member->data);
 		member->data=0;
-    if(!(member->flags&SOFT_NOFLUSH)) cache->currentsize-=member->size;
+	if(!(member->flags&SOFT_NOFLUSH)) cache->currentsize-=member->size;
 	}
 
 	free(member);
@@ -236,7 +237,7 @@ void *SOFT_AccessMember(struct soft_cache *cache,struct soft_member *member,unsi
 
 	if(!(flags&SOFT_NORESTORE))
   {
-    if(!(cache->ReloadFunc(member,member->data,member->id))) fprintf(stderr,"WARNING: could not restore data\n");
+	if(!(cache->ReloadFunc(member,member->data,member->id))) fprintf(stderr,"WARNING: could not restore data\n");
   }
 
 	member->numaccesses=cache->numaccesses;
@@ -288,7 +289,7 @@ unsigned long SOFT_ChangeMaxSize(struct soft_cache *cache,unsigned long newsize)
 
 	return oldsize;
 }
-       
+	   
 void SOFT_FlushOldestMember(struct soft_cache *cache)
 {
 	struct soft_member *curmem,*oldmem;

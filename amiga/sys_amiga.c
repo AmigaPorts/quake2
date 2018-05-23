@@ -3,7 +3,7 @@
 #ifdef STORM
 #include "keys.h"
 #else
-#include "client/keys.h"
+#include "../client/keys.h"
 #endif
 
 #include <exec/exec.h>
@@ -14,7 +14,13 @@
 #include <graphics/gfx.h>
 #include <proto/graphics.h>
 #include <sys/stat.h>
-#include "dll.h"
+//#include "dll.h"
+
+#ifdef __amigaos4__
+extern struct Window *GetWindowHandle(void);
+
+static char * __attribute__((used)) STACK_COOKIE = "$STACK:1000000";
+#endif
 
 cvar_t *nostdout;
 cvar_t *serialout = 0;
@@ -34,7 +40,11 @@ qboolean stdin_active = true;
 void Sys_ConsoleOutput (char *string)
 {
 	if (serialout && serialout->value)
+#ifdef __amigaos4__
+		DebugPrintF("%s", string);
+#else
 	    kprintf("%s", string);
+#endif
 
 	if (nostdout == 0)
 		return;
@@ -80,15 +90,15 @@ struct Library *KeymapBase = 0;
 
 void Sys_Leave(void)
 {
-    if (IntuitionBase)      CloseLibrary((struct Library *)IntuitionBase);
-    if (GfxBase)            CloseLibrary((struct Library *)GfxBase);
-    if (SocketBase)         CloseLibrary(SocketBase);
-    if (KeymapBase)         CloseLibrary(KeymapBase);
+	if (IntuitionBase)      CloseLibrary((struct Library *)IntuitionBase);
+	if (GfxBase)            CloseLibrary((struct Library *)GfxBase);
+	if (SocketBase)         CloseLibrary(SocketBase);
+	if (KeymapBase)         CloseLibrary(KeymapBase);
 
-    IntuitionBase   = NULL;
-    GfxBase         = NULL;
-    SocketBase      = NULL;
-    KeymapBase      = NULL;
+	IntuitionBase   = NULL;
+	GfxBase         = NULL;
+	SocketBase      = NULL;
+	KeymapBase      = NULL;
 }
 
 void Sys_Quit (void)
@@ -101,23 +111,23 @@ void Sys_Quit (void)
 
 void Sys_Init(void)
 {
-    IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 0L);
-    GfxBase = (struct GfxBase *)OpenLibrary("graphics.library", 0L);
-    SocketBase = OpenLibrary("bsdsocket.library", 0L);
-    KeymapBase = OpenLibrary("keymap.library", 0);
+	IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 0L);
+	GfxBase = (struct GfxBase *)OpenLibrary("graphics.library", 0L);
+	SocketBase = OpenLibrary("bsdsocket.library", 0L);
+	KeymapBase = OpenLibrary("keymap.library", 0);
 }
 
 void Sys_Error (char *error, ...)
 { 
-    va_list     argptr;
-    char        string[1024];
+	va_list     argptr;
+	char        string[1024];
 
 	CL_Shutdown ();
 	Qcommon_Shutdown ();
-    
-    va_start (argptr,error);
-    vsprintf (string,error,argptr);
-    va_end (argptr);
+	
+	va_start (argptr,error);
+	vsprintf (string,error,argptr);
+	va_end (argptr);
 	fprintf(stderr, "Error: %s\n", string);
 
 	Sys_Leave();
@@ -127,12 +137,12 @@ void Sys_Error (char *error, ...)
 
 void Sys_Warn (char *warning, ...)
 { 
-    va_list     argptr;
-    char        string[1024];
-    
-    va_start (argptr,warning);
-    vsprintf (string,warning,argptr);
-    va_end (argptr);
+	va_list     argptr;
+	char        string[1024];
+	
+	va_start (argptr,warning);
+	vsprintf (string,warning,argptr);
+	va_end (argptr);
 	fprintf(stderr, "Warning: %s", string);
 } 
 
@@ -169,9 +179,11 @@ Sys_UnloadGame
 */
 void Sys_UnloadGame (void)
 {
+#ifndef __amigaos4__
 	if (game_library) 
 		dllFreeLibrary (game_library);
 	game_library = NULL;
+#endif
 }
 
 /*
@@ -183,8 +195,10 @@ Loads the game dll
 */
 void *Sys_GetGameAPI (void *parms)
 {
+#ifndef __amigaos4__
 	void    *(*GetGameAPI) (void *);
 	void    (*SetExeName) (char *name);
+#endif
 
 	char    name[MAX_OSPATH];
 	char    curpath[MAX_OSPATH];
@@ -196,6 +210,7 @@ void *Sys_GetGameAPI (void *parms)
 #endif
 	void    **SegList;
 
+#ifndef __amigaos4__
 	if (game_library)
 		Com_Error (ERR_FATAL, "Sys_GetGameAPI without Sys_UnloadingGame");
 
@@ -233,6 +248,7 @@ void *Sys_GetGameAPI (void *parms)
 		Sys_UnloadGame ();              
 		return NULL;
 	}
+#endif
 
 	return GetGameAPI (parms);
 }
@@ -250,13 +266,17 @@ unsigned int mouse_wheel_used = 0; //18-AUG-02
 
 void Sys_SendKeyEvents (void)
 {
-    struct IntuiMessage *imsg;
-    extern struct MsgPort *g_pMessagePort;
-    extern struct Window * (*GetWindowHandle)(void);
-    extern unsigned int inittime;
+	struct IntuiMessage *imsg;
+	extern struct MsgPort *g_pMessagePort;
+	
+	#ifndef __amigaos4__
+	extern struct Window * (*GetWindowHandle)(void);
+	#endif
 
-    if (GetWindowHandle)
-    {
+	extern unsigned int inittime;
+
+	if (GetWindowHandle)
+	{
 	struct Window *w = GetWindowHandle();
 	if (w) g_pMessagePort = w->UserPort;
 	if (g_pMessagePort == 0)
@@ -265,10 +285,10 @@ void Sys_SendKeyEvents (void)
 	    ReportMouse(TRUE, w);
 	    g_pMessagePort = w->UserPort;
 	}
-    }
+	}
 
-    while (imsg = (struct IntuiMessage *)GetMsg(g_pMessagePort))
-    {
+	while (imsg = (struct IntuiMessage *)GetMsg(g_pMessagePort))
+	{
 	sys_msg_time=(imsg->Seconds-inittime)*1000+imsg->Micros/1000;
 	switch(imsg->Class)
 	{
@@ -324,18 +344,18 @@ void Sys_SendKeyEvents (void)
 	}
 
 	ReplyMsg((struct Message *)imsg);
-    }
+	}
 
 //18-AUG-02: workaround for bug in Topolino3 mouse driver
-    if( (!imsg) && (mouse_wheel_used) )
-    {
+	if( (!imsg) && (mouse_wheel_used) )
+	{
 	Key_Event(K_MWHEELUP, false, sys_msg_time, -1);
 	Key_Event(K_MWHEELDOWN, false, sys_msg_time, -1);
 	mouse_wheel_used = 0;
-    }
+	}
 
-    // grab frame time
-    sys_frame_time = Sys_Milliseconds();
+	// grab frame time
+	sys_frame_time = Sys_Milliseconds();
 }
 
 /*****************************************************************************/
@@ -350,46 +370,46 @@ char *Sys_GetClipboardData(void)
 
 int main (int argc, char **argv)
 {
-    int     time, oldtime, newtime;
+	int     time, oldtime, newtime;
 
 #ifdef MAGAZINTEST
 		char id2[100];
-    int i;
-    int invalid=0;
+	int i;
+	int invalid=0;
 
-    CopyMem(0xF00010, id2, 8);
-    for (i=0;i<8;i++)
-    {
-      if (i!=1)
-      {
-        if (id2[i]!=255) invalid=1;
-      }
-    }
-    if (id2[1]!=65) invalid=1;
-    if (invalid) exit(0);
+	CopyMem(0xF00010, id2, 8);
+	for (i=0;i<8;i++)
+	{
+	  if (i!=1)
+	  {
+		if (id2[i]!=255) invalid=1;
+	  }
+	}
+	if (id2[1]!=65) invalid=1;
+	if (invalid) exit(0);
 #endif
 
 
-    Qcommon_Init(argc, argv);
+	Qcommon_Init(argc, argv);
 
-    nostdout = Cvar_Get("nostdout", "1", CVAR_ARCHIVE);
-    serialout = Cvar_Get("serialout", "0", 0);
+	nostdout = Cvar_Get("nostdout", "1", CVAR_ARCHIVE);
+	serialout = Cvar_Get("serialout", "0", 0);
 
-    Com_Printf("\n");
-    Com_Printf("  \35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n");
-    Com_Printf("\1         Quake \21\20 Amiga\n");
-    Com_Printf("  \35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n");
-    Com_Printf("           Ported by:\n");
-    Com_Printf("       Hans-Joerg Frieden\n");
-    Com_Printf("         Thomas Frieden\n");
-    Com_Printf("         Steffen Haeuser\n");
-    Com_Printf("        Christian Michael\n");
-    Com_Printf("  \35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n");
-    Com_Printf("\n");
+	Com_Printf("\n");
+	Com_Printf("  \35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n");
+	Com_Printf("\1         Quake \21\20 Amiga\n");
+	Com_Printf("  \35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n");
+	Com_Printf("           Ported by:\n");
+	Com_Printf("       Hans-Joerg Frieden\n");
+	Com_Printf("         Thomas Frieden\n");
+	Com_Printf("         Steffen Haeuser\n");
+	Com_Printf("        Christian Michael\n");
+	Com_Printf("  \35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n");
+	Com_Printf("\n");
 
-    oldtime = Sys_Milliseconds ();
-    while (1)
-    {
+	oldtime = Sys_Milliseconds ();
+	while (1)
+	{
 	do
 	{
 	    newtime = Sys_Milliseconds ();
@@ -397,7 +417,7 @@ int main (int argc, char **argv)
 	} while (time < 1);
 	Qcommon_Frame (time);
 	oldtime = newtime;
-    }
+	}
 
 }
 
@@ -405,19 +425,21 @@ void Sys_CopyProtect(void)
 {
 }
 
+#ifndef __amigaos4__
 int putenv(const char *buffer)
 {
-    //FIXME: Implement me
+	//FIXME: Implement me
 }
+#endif
 
 void isort(void *pArray, unsigned int nElements, unsigned int nSize, int (*compare)(const void *a, const void *b))
 {
-    int i, j;
-    unsigned char *pCharArray = (unsigned char *)pArray;
-    unsigned char *pRef = malloc(nSize);
+	int i, j;
+	unsigned char *pCharArray = (unsigned char *)pArray;
+	unsigned char *pRef = malloc(nSize);
 
-    for (i = 1; i < nElements; i++)
-    {
+	for (i = 1; i < nElements; i++)
+	{
 	memcpy(pRef, pCharArray + nSize * i, nSize);
 	j = i;
 
@@ -428,44 +450,44 @@ void isort(void *pArray, unsigned int nElements, unsigned int nSize, int (*compa
 	}
 
 	memcpy(pCharArray + j*nSize, pRef, nSize);
-    }
+	}
 
-    free(pRef);
+	free(pRef);
 }
 
 void Sys_ConvertFilename(char *filename)
 {
-    while (*filename)
-    {
+	while (*filename)
+	{
 	if (*filename == '\\')
 	    *filename = '/';
 	filename++;
-    }
+	}
 }
 
 FILE * Sys_fopen(char *filename, char *access)
 {
-    char name[MAX_OSPATH];
+	char name[MAX_OSPATH];
 
-    strcpy(name, filename);
+	strcpy(name, filename);
 
-    Sys_ConvertFilename(name);
+	Sys_ConvertFilename(name);
 
-    return fopen(name, access);
+	return fopen(name, access);
 }
 
 
 
 int Sys_MapRawKey(int nRawkey)
 {
-    struct InputEvent ie;
-    WORD nResult;
-    char cBuffer[100];
-    UWORD nCode = nRawkey & 0xFF;
-    UWORD nQualifier = (nRawkey >> 8) % 0xFFFF;
+	struct InputEvent ie;
+	WORD nResult;
+	char cBuffer[100];
+	UWORD nCode = nRawkey & 0xFF;
+	UWORD nQualifier = (nRawkey >> 8) % 0xFFFF;
 
-    switch (nCode)
-    {
+	switch (nCode)
+	{
 	case 65:
 	    return -1;
 
@@ -482,7 +504,7 @@ int Sys_MapRawKey(int nRawkey)
 		return -1;
 	    else
 		return cBuffer[0];
-    }
+	}
 
-    return -1;
+	return -1;
 }

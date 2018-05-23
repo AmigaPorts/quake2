@@ -36,25 +36,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <mgl/gl.h>
 #include <intuition/intuition.h>
 #include <graphics/gfx.h>
+
+#ifndef __amigaos4__
 #include <cybergraphx/cybergraphics.h>
 #include <clib/chunkyppc_protos.h>
 #include <clib/intuition_protos.h>
 #include <clib/exec_protos.h>
 #include <clib/graphics_protos.h>
+#endif
+
 #include <proto/intuition.h>
 #include <proto/exec.h>
-#include <proto/cybergraphics.h>
+//#include <proto/cybergraphics.h>
 
-#ifndef __PPC__
+//#ifndef __PPC__
 #include <proto/timer.h>
-#endif
+//#endif
 
 
 #include "../ref_gl/gl_local.h"
 
 struct IntuitionBase *IntuitionBase;
 struct GfxBase *GfxBase;
-struct Library *CyberGfxBase;
+//struct Library *CyberGfxBase;
+struct TimerBase * TimerBase;
+extern struct SysBase * SysBase;
 
 hard_cache *TextureCache = NULL;
 
@@ -71,7 +77,9 @@ cvar_t *gl_framestat;
 
 cvar_t *gl_guardband;
 
+#ifndef __amigaos4__
 GLboolean old_context = GL_FALSE;
+#endif
 
 int gl_lmaps_drawn = 0;
 int gl_bpolies_drawn = 0;
@@ -80,15 +88,52 @@ int gl_bpolies_drawn = 0;
 extern cvar_t *vid_fullscreen;
 extern cvar_t *vid_ref;
 
+struct MiniGLIFace *IMiniGL = 0;
+struct Library *MiniGLBase = 0;
+
+struct GLContextIFace *context = 0;
+
+GLboolean MiniGL_Init(void)
+{
+	// Open MiniGL.library and get the interface
+	MiniGLBase = OpenLibrary("minigl.library", 0);
+	if (!MiniGLBase)
+		Com_Printf("GL_StartOpenGL() - could not load OpenGL subsystem\n");
+
+	IMiniGL = (struct MiniGLIFace *)GetInterface(MiniGLBase, "main", 1, NULL);
+	if (!IMiniGL)
+	{
+		CloseLibrary(MiniGLBase);
+		Com_Printf("GL_StartOpenGL() - could not load OpenGL subsystem\n");
+	
+		return GL_FALSE;
+	}
+
+	return GL_TRUE;
+}
+
+void MiniGL_Term(void)
+{
+	if (IMiniGL)
+	{
+		DropInterface((struct Interface *)IMiniGL);
+		CloseLibrary(MiniGLBase);
+
+		IMiniGL = 0;
+		MiniGLBase = 0;
+	}
+}
+
+
 void OpenLibs(void)
 {
-	if (MGLInit() == GL_FALSE)
+	if (MiniGL_Init() == GL_FALSE)
 	    Sys_Error("Unable to initialize MiniGL");
 }
 
 void CloseLibs(void)
 {
-	MGLTerm();
+	MiniGL_Term();
 }
 
 
@@ -129,17 +174,23 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	int                     exstyle;
 	cvar_t                  *depth, *buffers, *cv;
 
+#ifndef __amigaos4__
 	if (old_context)
 	{
 	    mglDeleteContext();
 	    old_context = GL_FALSE;
 	}
+#else
+	if (context)
+	{
+		context->DeleteContext();
+	}
+#endif
 
-
-	depth =     ri.Cvar_Get("gl_forcedepth", "15", CVAR_ARCHIVE);
+	depth =     ri.Cvar_Get("gl_forcedepth", "16", CVAR_ARCHIVE);
 	buffers =   ri.Cvar_Get("gl_buffers", "3", CVAR_ARCHIVE);
 	cv =        ri.Cvar_Get("gl_closeworkbench", "1", CVAR_ARCHIVE);
-
+#ifndef __amigaos4__
 	if (cv->value) mglProposeCloseDesktop(GL_TRUE);
 	else           mglProposeCloseDesktop(GL_FALSE);
 
@@ -153,6 +204,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		mglChooseGuardBand(GL_TRUE);
 	else
 		mglChooseGuardBand(GL_FALSE);
+#endif
 
 	if (fullscreen)
 	{
@@ -165,7 +217,9 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		vid_ypos = ri.Cvar_Get ("vid_ypos", "0", 0);
 		x = vid_xpos->value;
 		y = vid_ypos->value;
+#ifndef __amigaos4__
 		mglChooseWindowMode(GL_TRUE);
+#endif
 	}
 
 
@@ -189,18 +243,21 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	** means that 4096 is able to store 1024 polys with
 	** max 4096 verts in total (tightly packed)
 	*/
-
+#ifndef __amigaos4__
 	mglChooseVertexBufferSize( 4096 );
+#endif
 
 //	mglChooseMtexBufferSize( 8192 );
 
 	//base the size on #of polygons to store
 	gl_mtexbuffersize = ri.Cvar_Get("gl_mtexbuffersize", "1024", CVAR_ARCHIVE);
 
+#ifndef __amigaos4__
 	if((int)gl_mtexbuffersize <= 1024)
 		mglChooseMtexBufferSize( 4096 );
 	else
 		mglChooseMtexBufferSize( (int)gl_mtexbuffersize->value * 4);
+#endif
 
 #if 0
 	//enable texture-sorted drawing for the virtual TMU1
@@ -209,10 +266,42 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 
 #endif
 
+#ifndef __amigaos4__
 	old_context = (NULL == mglCreateContext(0, 0, width, height) ? GL_FALSE : GL_TRUE);
+#else
 
+	if (depth != 16)
+		depth = 24;
+
+	context = IMiniGL->CreateContextTags(
+			MGLCC_Width,                    width,
+			MGLCC_Height,                   height,
+			MGLCC_TextureBufferSize,		65536,
+			MGLCC_NoMipMapping,				FALSE,
+			MGLCC_Windowed,                 !fullscreen,
+			MGLCC_Buffers,                  3,
+			MGLCC_PixelDepth,               depth,
+			MGLCC_CloseGadget,              FALSE /*TRUE*/,
+			MGLCC_SizeGadget,               FALSE /*TRUE*/,
+			MGLCC_StencilBuffer,			GL_FALSE /*useStencil TODO */,
+		TAG_DONE);
+
+#endif
+
+#ifndef __amigaos4__
 	if (!old_context)
-	    ri.Sys_Error (ERR_FATAL, "Couldn't create window");
+#else
+	if (!context)
+#endif
+	{
+		ri.Sys_Error (ERR_FATAL, "Couldn't create window");
+		return false;
+	}
+
+#ifdef __amigaos4__
+	mglMakeCurrent(context);
+#endif
+
 	if (!fullscreen)
 	    MoveWindow(mglGetWindowHandle(), x, y);
 
@@ -263,7 +352,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	// do a CDS if needed
 	if (fullscreen)
 	{
-		ri.Con_Printf( PRINT_ALL, "fullscreen\n" );
+		ri.Con_Printf( PRINT_ALL, "fullscreen %d * %d\n", width, height );
 		*pwidth = width;
 		*pheight = height;
 		if ( !VID_CreateWindow (width, height, true) )
@@ -292,10 +381,18 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 */
 void GLimp_Shutdown( void )
 {
+#ifndef __amigaos4__
 	if (old_context == GL_TRUE)
 	    mglDeleteContext();
 
 	old_context = GL_FALSE;
+#else
+	if (context)
+	{
+		context->DeleteContext();
+		context = NULL;
+	}
+#endif
 
 	if (TextureCache)
 	{
@@ -308,18 +405,24 @@ void GLimp_Shutdown( void )
 
 void GLimp_TextureSwap(void *data, int ordinal)
 {
-        image_t *img = (image_t *)data;
-        img->is_swapped = true;
-        glDeleteTextures(1, &img->texnum);
+	if (data)
+	{
+		image_t *img = (image_t *)data;
+		img->is_swapped = true;
+		glDeleteTextures(1, &img->texnum);
+	}
 }
 
 void GLimp_TextureReload(void *data, int ordinal)
 {
-        extern void GL_RestoreImage(image_t *image);
+	if (data)
+	{
+		extern void GL_RestoreImage(image_t *image);
 
-        image_t *img = (image_t *)data;
-        GL_RestoreImage(img);
-        img->is_swapped = false;
+		image_t *img = (image_t *)data;
+		GL_RestoreImage(img);
+		img->is_swapped = false;
+	}
 }
 
 /*
@@ -343,7 +446,7 @@ int GLimp_Init( void *hinstance, void *wndproc )
 
 	if (cachesize >= 1000000)
 	{
-         TextureCache = HARD_CreateCache(cachesize, (MAX_GLTEXTURES - (TEXNUM_SCRAPS - TEXNUM_LIGHTMAPS)), GLimp_TextureSwap, GLimp_TextureReload);
+		 TextureCache = HARD_CreateCache(cachesize, (MAX_GLTEXTURES - (TEXNUM_SCRAPS - TEXNUM_LIGHTMAPS)), GLimp_TextureSwap, GLimp_TextureReload);
 	}
 
 	return 1;
@@ -363,19 +466,23 @@ void GLimp_BeginFrame( float camera_separation )
 
   int current,peak;
 
+#ifndef __amigaos4__
   mglTexMemStat(&current,&peak);
+#endif
 
   //kprintf("Stat: %i %i\n",current,peak);
 
+#if 0
+
 	if (timed == 0)
 	{
-#ifdef __PPC__	
+#if defined (__PPC__) && !defined(__amigaos4__)
 	GetSysTimePPC(&tv);
 #else
-      if (!TimerBase)
-	TimerBase=FindName(&SysBase->DeviceList,"timer.device");
+	  if (!TimerBase)
+	TimerBase = (struct TimerBase*) FindName(&SysBase->DeviceList,"timer.device");
 
-       GetSysTime(&tv);
+	   GetSysTime(&tv);
 #endif
 	    timed = 1;
 	}
@@ -390,19 +497,19 @@ void GLimp_BeginFrame( float camera_separation )
 
 	    start = tv;
 
-#ifdef __PPC__
+#if defined (__PPC__) && !defined(__amigaos4__)
 	    GetSysTimePPC(&end);
 
 	    tv = end;
 
 	    SubTimePPC(&end, &start);
 #else
-          if (!TimerBase)
+		  if (!TimerBase)
 	    TimerBase=FindName(&SysBase->DeviceList,"timer.device");      
 
 	    GetSysTime(&end);
 	    tv = end;
-          
+		  
 	    SubTime(&end,&start);  
 #endif
 
@@ -410,6 +517,7 @@ void GLimp_BeginFrame( float camera_separation )
 	    ms = end.tv_micro;
 #endif
 	}
+#endif
 
 	if ( gl_lockmode->modified)
 	{
@@ -450,14 +558,14 @@ void GLimp_BeginFrame( float camera_separation )
 		gl_bitdepth->modified = false;
 	}*/
 	mglLockDisplay();
-
+#if 0
 	if (gl_framestat->value == 1)
 	{
 	    ri.Con_Printf(PRINT_ALL, "Frame time: %d microseconds\n", ms);
 	    ri.Con_Printf(PRINT_ALL, "FPS: %3.3f fps\n", 1000000.0/(float)ms);
 	    ri.Con_Printf(PRINT_ALL, "LM: %d   BP: %d\n", gl_lmaps_drawn, gl_bpolies_drawn);
 	}
-
+#endif
 	gl_lmaps_drawn = 0;
 	gl_bpolies_drawn = 0;
 
@@ -486,6 +594,6 @@ void GLimp_AppActivate( qboolean active )
 
 struct Window *GetWindowHandle(void)
 {
-    return mglGetWindowHandle();
+	return (context) ? mglGetWindowHandle() : NULL;
 }
 

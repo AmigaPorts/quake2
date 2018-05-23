@@ -90,7 +90,7 @@
 #include <stdio.h>
 #ifdef __PPC__
 #ifdef WOS
-#include <powerpc/powerpc_protos.h>
+//#include <powerpc/powerpc_protos.h>
 #else /* PowerUp */
 #include <powerup/gcclib/powerup_protos.h>
 #endif

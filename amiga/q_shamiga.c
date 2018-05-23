@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <string.h>
-#include <fnmatch.h>
+//#include <fnmatch.h>
 
 //===============================================================================
 
@@ -40,26 +40,26 @@ void *Hunk_Begin (int maxsize)
 
 void *Hunk_Alloc (int size)
 {
-    // round to cacheline
-    void *mem;
-    void **tempmembase=membase;
-    int count=alloccount;
-    size = (size+31)&~31;
+	// round to cacheline
+	void *mem;
+	void **tempmembase=membase;
+	int count=alloccount;
+	size = (size+31)&~31;
 
-    cursize += size;
-    if (cursize > hunkmaxsize)
+	cursize += size;
+	if (cursize > hunkmaxsize)
 	Sys_Error ("Hunk_Alloc overflow");
-    if(!(mem=malloc(size)))
+	if(!(mem=malloc(size)))
 	Sys_Error("Hunk_Alloc failed: Could not allocate %i Bytes !",size);
 
-    memset(mem,0,size);
-    while(count>=HUNK_MAXHUNKS)
-    {
+	memset(mem,0,size);
+	while(count>=HUNK_MAXHUNKS)
+	{
 	tempmembase=tempmembase[HUNK_MAXHUNKS-1];
 	count-=HUNK_MAXHUNKS;
-    }
-    tempmembase[count]=mem;
-    alloccount++;
+	}
+	tempmembase[count]=mem;
+	alloccount++;
 
 	if(alloccount%HUNK_MAXHUNKS==HUNK_MAXHUNKS-1)
 	{
@@ -73,24 +73,24 @@ void *Hunk_Alloc (int size)
 		alloccount++;
 	}
 
-    return mem;
+	return mem;
 }
 
 int Hunk_End (void)
 {
 
-    // free the remaining unused virtual memory
+	// free the remaining unused virtual memory
 
-    hunkcount++;
-    return cursize;
+	hunkcount++;
+	return cursize;
 }
 
 void Hunk_Free (void *base)
 {
 	int i=0;
 	void **memarray=base;
-    if ( memarray )
-    {
+	if ( memarray )
+	{
 	while(memarray[i])
 	{
 		if(i==HUNK_MAXHUNKS-1)
@@ -104,8 +104,8 @@ void Hunk_Free (void *base)
 		free(memarray[i++]);
 	}
 	free (memarray);
-    }
-    hunkcount--;
+	}
+	hunkcount--;
 }
 
 //===============================================================================
@@ -139,9 +139,9 @@ int Sys_Milliseconds (void)
 
 void Sys_Mkdir (char *path)
 {
-    int i = mkdir (path,0755);
-    if (i == -1 && errno != EEXIST && errno != 26)
-    {
+	int i = mkdir (path,0755);
+	if (i == -1 && errno != EEXIST && errno != 26)
+	{
 #ifdef __PPC__
 	printf("Error creating '%s':", path);
 	switch(errno)
@@ -158,7 +158,7 @@ void Sys_Mkdir (char *path)
 		printf("Errno = %d\n", errno); break;
 	}
 #endif
-    }
+	}
 }
 
 //============================================
@@ -170,7 +170,7 @@ DIR *   findhandle=NULL;
 
 static qboolean CompareAttributes( unsigned found, unsigned musthave, unsigned canthave )
 {
-    return true;
+	return true;
 }
 
 #include <stdio.h>
@@ -181,6 +181,8 @@ static qboolean CompareAttributes( unsigned found, unsigned musthave, unsigned c
 #include <exec/exec.h>
 #include <dos/dos.h>
 #include <dos/dosasl.h>
+#include <dos/anchorpath.h>
+#define AnchorPath AnchorPathOld
 #include <proto/exec.h>
 #include <proto/dos.h>
 
@@ -190,23 +192,23 @@ static qboolean CompareAttributes( unsigned found, unsigned musthave, unsigned c
 #define MAX_EXT    20
 
 typedef struct {
-    char    name[MAX_FNAME+MAX_EXT+1];
-    int     attrib;
-    long    size;
-    long    time_write;
-    // ...
+	char    name[MAX_FNAME+MAX_EXT+1];
+	int     attrib;
+	long    size;
+	long    time_write;
+	// ...
 } _finddata_t;
 
 char nameBuffer[512];
 
 void stormPathConvert(const char *path, char *output)
 {
-    while (*path) {
+	while (*path) {
 	if (*path == '\\') *output = '/';
 	else               *output = *path;
 	path++; output++;
-    }
-    *output = '\0';
+	}
+	*output = '\0';
 }
 
 _finddata_t fileinfo1;
@@ -214,17 +216,17 @@ long myfindhandle=0;
 ;// FillInfo
 void FillInfo(struct AnchorPath *ap, _finddata_t *fileinfo)
 {
-    strncpy(fileinfo->name, ap->ap_Buf, 250);
+	strncpy(fileinfo->name, ap->ap_Buf, 250);
 
 
-    if (ap->ap_Info.fib_EntryType >= 0)
+	if (ap->ap_Info.fib_DirEntryType >= 0)
 	fileinfo->attrib = 1;
-    else
+	else
 	fileinfo->attrib = 0;
 
-    fileinfo->size = ap->ap_Info.fib_Size;
+	fileinfo->size = ap->ap_Info.fib_Size;
 
-    fileinfo->time_write = ap->ap_Info.fib_Date.ds_Days*4320000
+	fileinfo->time_write = ap->ap_Info.fib_Date.ds_Days*4320000
 			 + ap->ap_Info.fib_Date.ds_Minute*3000
 			 + ap->ap_Info.fib_Date.ds_Tick;
 }
@@ -232,39 +234,39 @@ void FillInfo(struct AnchorPath *ap, _finddata_t *fileinfo)
 ;// _findfirst
 long _findfirst(char *path, _finddata_t *fileinfo)
 {
-    struct AnchorPath *ap = (struct AnchorPath *)AllocVec(sizeof(struct AnchorPath)+256, MEMF_CLEAR);
+	struct AnchorPath *ap = (struct AnchorPath *)AllocVec(sizeof(struct AnchorPath)+256, MEMF_CLEAR);
 
-    if (!ap) return 0L;
+	if (!ap) return 0L;
 
-    stormPathConvert(path, nameBuffer);
+	stormPathConvert(path, nameBuffer);
 
-    ap->ap_BreakBits = NULL;
-    ap->ap_Strlen = 250;
-    ap->ap_Flags  = APF_DODOT;
-    if (MatchFirst((STRPTR)nameBuffer, ap) != 0) {
+	ap->ap_BreakBits = NULL;
+	ap->ap_Strlen = 250;
+	ap->ap_Flags  = APF_DODOT;
+	if (MatchFirst((STRPTR)nameBuffer, ap) != 0) {
 	FreeVec(ap);
 	return 0;
-    } else {
+	} else {
 	FillInfo(ap, fileinfo);
-    }
-    return (long)ap;
+	}
+	return (long)ap;
 }
 ;;//
 ;// _findnext
 long _findnext(long FindHandle, _finddata_t *fileinfo)
 {
-    if (0 !=  MatchNext((struct AnchorPath *)FindHandle)) return -1;
-    FillInfo((struct AnchorPath *)FindHandle, fileinfo);
-    return 0;
+	if (0 !=  MatchNext((struct AnchorPath *)FindHandle)) return -1;
+	FillInfo((struct AnchorPath *)FindHandle, fileinfo);
+	return 0;
 }
 ;;//
 ;// _findclose
 void _findclose(long FindHandle)
 {
-    if (FindHandle) {
+	if (FindHandle) {
 	MatchEnd((struct AnchorPath *)FindHandle);
 	FreeVec((void *)FindHandle);
-    }
+	}
 }
 ;;//
 char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave )
@@ -274,17 +276,17 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave )
   if (strlen(fileinfo1.name)<1) return 0;
   else return fileinfo1.name;
 }
-    
+	
 char *Sys_FindNext ( unsigned musthave, unsigned canthave )
 {
-    if (_findnext(myfindhandle,&fileinfo1)==-1) return 0;
-     else return fileinfo1.name;
+	if (_findnext(myfindhandle,&fileinfo1)==-1) return 0;
+	 else return fileinfo1.name;
 }
 
 void Sys_FindClose (void)
 {
-    if (myfindhandle) _findclose(myfindhandle);
-    myfindhandle=0;
+	if (myfindhandle) _findclose(myfindhandle);
+	myfindhandle=0;
 }
 
 

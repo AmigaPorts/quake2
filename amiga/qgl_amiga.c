@@ -1,5 +1,7 @@
 #include "../ref_gl/gl_local.h"
+#ifndef __amigaos4__
 #include "dll.h"
+#endif
 
 void ( APIENTRY * qglColorTableEXT)( int, int, int, int, int, const void * );
 void ( APIENTRY * qglMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
@@ -13,7 +15,7 @@ void ( APIENTRY * qglClientActiveTextureARB)( GLenum );
 
 void *qwglGetProcAddress(char *x)
 {
-    return 0;
+	return 0;
 }
 
 void QGL_Shutdown(void)
@@ -22,16 +24,16 @@ void QGL_Shutdown(void)
 
 qboolean QGL_Init(const char *dllname)
 {
-    qglColorTableEXT        = 0; //glColorTable;
+	qglColorTableEXT        = 0; //glColorTable;
 
-    qglMTexCoord2fSGIS      = 0;
-    qglLockArraysEXT        = 0;
-    qglUnlockArraysEXT      = 0;
-    qglPointParameterfEXT   = 0;
-    qglPointParameterfvEXT  = 0;
-    qglSelectTextureSGIS    = 0;
+	qglMTexCoord2fSGIS      = 0;
+	qglLockArraysEXT        = 0;
+	qglUnlockArraysEXT      = 0;
+	qglPointParameterfEXT   = 0;
+	qglPointParameterfvEXT  = 0;
+	qglSelectTextureSGIS    = 0;
 
-    return true;
+	return true;
 }
 
 void GLimp_EnableLogging( qboolean enable )
@@ -42,7 +44,7 @@ void GLimp_LogNewFrame( void )
 {
 }
 
-
+#ifndef __amigaos4__
 void* __saveds dllFindResource(int id, char *pType)
 {
 	return NULL;
@@ -73,14 +75,15 @@ dll_tExportSymbol DLL_ExportSymbols[]=
 
 dll_tImportSymbol DLL_ImportSymbols[] =
 {
-    {0, 0, 0, 0}
+	{0, 0, 0, 0}
 };
 
 int DLL_Init()
 {
-    return 1;
+	return 1;
 }
 
 void DLL_DeInit()
 {
 }
+#endif

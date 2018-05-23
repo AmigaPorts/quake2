@@ -1,7 +1,5 @@
-#CC = pgcc -V 2.95.2 -warpup
-#CXX = pg++ -V 2.95.2 -warpup
-CC = ppc-amigaos-gcc -warpup
-CXX = ppc-amigaos-c++ -warpup
+CC = ppc-amigaos-gcc
+CXX = ppc-amigaos-c++
 LD = /ade/ppc-amigaos-bin/ld
 RANLIB = /ade/bin/ppc-amigaos-ranlib
 NM = /ade/bin/ppc-amigaos-nm
@@ -15,21 +13,21 @@ STRIP = /ade/bin/ppc-amigaos-strip
 # INSTALLDIR is where the binaries should be copied to.
 #BASEPATH = work:q2/current/recent/
 #INSTALLDIR = work:Q2/current/recent/
-BASEPATH = Quake2_Src:
-INSTALLDIR = Quake2_Src:
+BASEPATH =  #Quake2_Src:
+INSTALLDIR = #Quake2_Src:
 
-BASECFLAGS = -I$(BASEPATH) -I$(BASEPATH)game -I$(BASEPATH)amiga -I$(BASEPATH)client \
+BASECFLAGS = -I$(BASEPATH) -I../ -I$(BASEPATH)game -I$(BASEPATH)amiga -I$(BASEPATH)client \
 	     -I$(BASEPATH)ctf -I$(BASEPATH)qcommon -I$(BASEPATH)server \
-	     -DAMIGA -D_inline="static __inline" -D__int64="long long" \
+	     -DAMIGA -D__USE_INLINE__ -D__NOLIBBASE__ \
 	     -D__stdcall= -DENDIAN_INLINE\
-	     -D_DEVEL
+	     -D_DEVEL #  -D_inline="static __inline" -D__int64="long long"
 
-OPTIMIZE = -O3 #-ffast-math -mmultiple
+OPTIMIZE = -O3 #-O3 #-ffast-math -mmultiple
 DEBUG = -g
 
-CFLAGS = $(BASECFLAGS) $(OPTIMIZE) $(LOCAL_CFLAGS) $(DEBUG)
+CFLAGS = $(BASECFLAGS) $(OPTIMIZE) $(LOCAL_CFLAGS) $(DEBUG) -DREF_HARD_LINKED -DGAME_HARD_LINKED -DTimeVal=timeval
 
-LIBS = -ldllppc -lppcamiga -ldebug
+LIBS = -lGL -lauto -lsocket #-ldllppc -lppcamiga -ldebug
 
 $(PRODUCT): $(OBJ) $(EXTRA_DEPS)
 	$(CC) -o $(PRODUCT) $(OBJ) $(LIBS) $(EXTRA_LIBS)

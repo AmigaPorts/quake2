@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // gl_mesh.c: triangle model functions 
  
 #include "gl_local.h" 
- 
+#include <gl/glext.h> //GL_CLIP_VOLUME_CLIPPING_HINT_EXT
 /* 
 ============================================================= 
  
@@ -53,8 +53,8 @@ typedef float vec4_t[4];
 
 typedef struct varray_s
 {
-        GLfloat data[3];
-        GLuint  color;
+		GLfloat data[3];
+		GLuint  color;
 
 	/*
 	** 3rd data slot is used for MiniGL w-coords with
@@ -68,7 +68,7 @@ typedef struct varray_s
 extern cvar_t   *gl_smoothmodels;
 
 
-#define AMIGA_VOLATILE_ARRAYS 1 /* experimental feature */
+//#define AMIGA_VOLATILE_ARRAYS 1 /* experimental feature */
 /* this invalidates shadow-data if using vertexarrays, so we have to copy the data before the arrays are locked */
 
 #ifndef AMIGA_VOLATILE_ARRAYS
@@ -119,22 +119,22 @@ void GL_LerpShadowVerts( int nverts, dtrivertx_t *v, float *lerp, float move[3] 
 	float   height, lheight; 
 	float   *shadowdat;
  
-      lheight = currententity->origin[2] - lightspot[2]; 
-      height = -lheight + 1.0;
+	  lheight = currententity->origin[2] - lightspot[2]; 
+	  height = -lheight + 1.0;
 
 	lheight += move[2];
 
 	shadowdat = shadowverts[0];
 
-      for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE, shadowdat+=4 ) 
-      { 
-      	shadowdat[0] = move[0] + lerp[0];
-      	shadowdat[1] = move[1] + lerp[1];
+	  for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE, shadowdat+=4 ) 
+	  { 
+	  	shadowdat[0] = move[0] + lerp[0];
+	  	shadowdat[1] = move[1] + lerp[1];
 
-      	shadowdat[0] -= shadevector[0]*(lerp[2]+lheight);
-      	shadowdat[1] -= shadevector[1]*(lerp[2]+lheight);
+	  	shadowdat[0] -= shadevector[0]*(lerp[2]+lheight);
+	  	shadowdat[1] -= shadevector[1]*(lerp[2]+lheight);
 		shadowdat[2] = height;
-      } 
+	  } 
 }
 
 #endif
@@ -148,173 +148,173 @@ void GL_LerpVerts_notrans( int nverts, dtrivertx_t *v, dtrivertx_t *ov, dtrivert
 
    if(ov) //lerp
    { 
-        //PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-        { 
-                for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE ) 
-                { 
-                        const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
+		//PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+		{ 
+				for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE ) 
+				{ 
+						const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
  
-                        lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
-                        lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
-                        lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
-                } 
-        } 
-        else 
-        {
-                if( !gl_smoothmodels->value )
-                {
-                  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
-                  {
-                        lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
-                  }
-                }
-                else if( gl_vertex_arrays->value )
-                {
-                  ULONG r,g,b,a;
-                  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
+						lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
+						lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
+						lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
+				} 
+		} 
+		else 
+		{
+				if( !gl_smoothmodels->value )
+				{
+				  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
+				  {
+						lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
+						lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
+						lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
+				  }
+				}
+				else if( gl_vertex_arrays->value )
+				{
+				  ULONG r,g,b,a;
+				  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
 
-                  if (currententity->flags & RF_TRANSLUCENT)
-                    a = ((GLuint)(currententity->alpha * 255.f)) << 24;
-                  else
-                    a = 0xFF000000;
+				  if (currententity->flags & RF_TRANSLUCENT)
+					a = ((GLuint)(currententity->alpha * 255.f)) << 24;
+				  else
+					a = 0xFF000000;
 
-                  shadelight[0] *= 255.f;
-                  shadelight[1] *= 255.f;
-                  shadelight[2] *= 255.f;
+				  shadelight[0] *= 255.f;
+				  shadelight[1] *= 255.f;
+				  shadelight[2] *= 255.f;
 
-                  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
-                  {
+				  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
+				  {
 			  ULONG argb = a;
 
-                        float l = shadedots[verts[i].lightnormalindex];
+						float l = shadedots[verts[i].lightnormalindex];
 
-                        r = l * shadelight[0];
-                        g = l * shadelight[1];
-                        b = l * shadelight[2];
+						r = l * shadelight[0];
+						g = l * shadelight[1];
+						b = l * shadelight[2];
  
-                        if(r > 0x000000FF) argb |= 0x00FF0000;
-                        else argb |= r << 16;
-                        if(g > 0x000000FF) argb |= 0x0000FF00;
-                        else argb |= g << 8;
-                        if(b > 0x000000FF) argb |= 0x000000FF;
+						if(r > 0x000000FF) argb |= 0x00FF0000;
+						else argb |= r << 16;
+						if(g > 0x000000FF) argb |= 0x0000FF00;
+						else argb |= g << 8;
+						if(b > 0x000000FF) argb |= 0x000000FF;
 			  else argb |= b;
 
 #ifdef AMIGA_VOLATILE_ARRAYS
 			  ((ULONG*)lerp)[C_UBYTE] = argb;
 #else 
-                        vArray[i].color = argb;
+						vArray[i].color = argb;
 #endif
 
-                        lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
-                  }
-                }
-                else
-                {
-                  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
+						lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
+						lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
+						lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
+				  }
+				}
+				else
+				{
+				  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
  
-                  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
-                  {
-                        float l = shadedots[verts[i].lightnormalindex];
+				  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
+				  {
+						float l = shadedots[verts[i].lightnormalindex];
 
-                        vArray[i].data[0] = l * shadelight[0];
-                        vArray[i].data[1] = l * shadelight[1];
-                        vArray[i].data[2] = l * shadelight[2];
+						vArray[i].data[0] = l * shadelight[0];
+						vArray[i].data[1] = l * shadelight[1];
+						vArray[i].data[2] = l * shadelight[2];
 
-                        lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
-                  }
+						lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
+						lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
+						lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
+				  }
 		  }
-        } 
+		} 
    }
    else
    {
-        //PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-        { 
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE ) 
-                { 
-                        const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
+		//PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+		{ 
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE ) 
+				{ 
+						const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
  
-                        lerp[0] = v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
-                        lerp[1] = v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
-                        lerp[2] = v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
-                } 
-        } 
-        else 
-        {
-              if( !gl_smoothmodels->value )
-              {
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
-                { 
-                        lerp[0] = v->v[0]*frontv[0]; 
-                        lerp[1] = v->v[1]*frontv[1]; 
-                        lerp[2] = v->v[2]*frontv[2];
-                }
-              } 
-              else if( gl_vertex_arrays->value )
-              {
-                ULONG r,g,b,a;
-                const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
+						lerp[0] = v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
+						lerp[1] = v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
+						lerp[2] = v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
+				} 
+		} 
+		else 
+		{
+			  if( !gl_smoothmodels->value )
+			  {
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
+				{ 
+						lerp[0] = v->v[0]*frontv[0]; 
+						lerp[1] = v->v[1]*frontv[1]; 
+						lerp[2] = v->v[2]*frontv[2];
+				}
+			  } 
+			  else if( gl_vertex_arrays->value )
+			  {
+				ULONG r,g,b,a;
+				const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
 
-                if (currententity->flags & RF_TRANSLUCENT)
-                  a = ((GLuint)(currententity->alpha * 255.f)) << 24;
-                else
-                  a = 0xFF000000;
+				if (currententity->flags & RF_TRANSLUCENT)
+				  a = ((GLuint)(currententity->alpha * 255.f)) << 24;
+				else
+				  a = 0xFF000000;
  
-                shadelight[0] *= 255.f;
-                shadelight[1] *= 255.f;
-                shadelight[2] *= 255.f;
+				shadelight[0] *= 255.f;
+				shadelight[1] *= 255.f;
+				shadelight[2] *= 255.f;
 
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
-                { 
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
+				{ 
 			  ULONG argb = a;
 
-                        float l = shadedots[verts[i].lightnormalindex];
+						float l = shadedots[verts[i].lightnormalindex];
  
-                        r = l * shadelight[0];
-                        g = l * shadelight[1];
-                        b = l * shadelight[2];
+						r = l * shadelight[0];
+						g = l * shadelight[1];
+						b = l * shadelight[2];
  
-                        if(r > 0x000000FF) argb |= 0x00FF0000;
-                        else argb |= r << 16;
-                        if(g > 0x000000FF) argb |= 0x0000FF00;
-                        else argb |= g << 8;
-                        if(b > 0x000000FF) argb |= 0x000000FF;
+						if(r > 0x000000FF) argb |= 0x00FF0000;
+						else argb |= r << 16;
+						if(g > 0x000000FF) argb |= 0x0000FF00;
+						else argb |= g << 8;
+						if(b > 0x000000FF) argb |= 0x000000FF;
 			  else argb |= b;
 
 #ifdef AMIGA_VOLATILE_ARRAYS
 			  ((ULONG*)lerp)[C_UBYTE] = argb;
 #else 
-                        vArray[i].color = argb;
+						vArray[i].color = argb;
 #endif
 
-                        lerp[0] = v->v[0]*frontv[0]; 
-                        lerp[1] = v->v[1]*frontv[1]; 
-                        lerp[2] = v->v[2]*frontv[2]; 
-                } 
-              }
-              else
-              {
-                  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
-                  { 
-                        float l = shadedots[verts[i].lightnormalindex];
+						lerp[0] = v->v[0]*frontv[0]; 
+						lerp[1] = v->v[1]*frontv[1]; 
+						lerp[2] = v->v[2]*frontv[2]; 
+				} 
+			  }
+			  else
+			  {
+				  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
+				  { 
+						float l = shadedots[verts[i].lightnormalindex];
 
-                        vArray[i].data[0] = l * shadelight[0];
-                        vArray[i].data[1] = l * shadelight[1];
-                        vArray[i].data[2] = l * shadelight[2];
-                        lerp[0] = v->v[0]*frontv[0]; 
-                        lerp[1] = v->v[1]*frontv[1]; 
-                        lerp[2] = v->v[2]*frontv[2]; 
-                  } 
-              }
-        } 
+						vArray[i].data[0] = l * shadelight[0];
+						vArray[i].data[1] = l * shadelight[1];
+						vArray[i].data[2] = l * shadelight[2];
+						lerp[0] = v->v[0]*frontv[0]; 
+						lerp[1] = v->v[1]*frontv[1]; 
+						lerp[2] = v->v[2]*frontv[2]; 
+				  } 
+			  }
+		} 
    } 
 } 
 
@@ -326,168 +326,168 @@ void GL_LerpVerts( int nverts, dtrivertx_t *v, dtrivertx_t *ov, dtrivertx_t *ver
 
    if(ov) //lerp
    { 
-        //PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-        { 
-                for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE ) 
-                { 
-                        const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
+		//PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+		{ 
+				for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE ) 
+				{ 
+						const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
  
-                        lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
-                        lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
-                        lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
-                } 
-        } 
-        else 
-        {
-                if( !gl_smoothmodels->value )
-                {
-                  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
-                  {
-                        lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
-                  }
-                }
-                else if( gl_vertex_arrays->value )
-                {
-                  ULONG r,g,b,a;
-                  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
+						lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
+						lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
+						lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
+				} 
+		} 
+		else 
+		{
+				if( !gl_smoothmodels->value )
+				{
+				  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
+				  {
+						lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
+						lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
+						lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
+				  }
+				}
+				else if( gl_vertex_arrays->value )
+				{
+				  ULONG r,g,b,a;
+				  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
 
-                  if (currententity->flags & RF_TRANSLUCENT)
-                    a = ((GLuint)(currententity->alpha * 255.f)) << 24;
-                  else
-                    a = 0xFF000000;
+				  if (currententity->flags & RF_TRANSLUCENT)
+					a = ((GLuint)(currententity->alpha * 255.f)) << 24;
+				  else
+					a = 0xFF000000;
 
-                  shadelight[0] *= 255.f;
-                  shadelight[1] *= 255.f;
-                  shadelight[2] *= 255.f;
+				  shadelight[0] *= 255.f;
+				  shadelight[1] *= 255.f;
+				  shadelight[2] *= 255.f;
 
-                  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
-                  {
+				  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
+				  {
 			  ULONG argb = a;
 
-                        float l = shadedots[verts[i].lightnormalindex];
+						float l = shadedots[verts[i].lightnormalindex];
 
-                        r = l * shadelight[0];
-                        g = l * shadelight[1];
-                        b = l * shadelight[2];
+						r = l * shadelight[0];
+						g = l * shadelight[1];
+						b = l * shadelight[2];
  
-                        if(r > 0x000000FF) r = 0x00FF0000;
-                        else r <<= 16;
-                        if(g > 0x000000FF) g = 0x0000FF00;
-                        else g <<= 8;
-                        if(b > 0x000000FF) b = 0x000000FF;
+						if(r > 0x000000FF) r = 0x00FF0000;
+						else r <<= 16;
+						if(g > 0x000000FF) g = 0x0000FF00;
+						else g <<= 8;
+						if(b > 0x000000FF) b = 0x000000FF;
 
 #ifdef AMIGA_VOLATILE_ARRAYS
 			  ((ULONG*)lerp)[C_UBYTE] = a|r|g|b;
 #else 
-                        vArray[i].color = a|r|g|b;
+						vArray[i].color = a|r|g|b;
 #endif
-                        lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
-                  }
-                }
-                else
-                {
-                  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
+						lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
+						lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
+						lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
+				  }
+				}
+				else
+				{
+				  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
  
-                  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
-                  {
-                        float l = shadedots[verts[i].lightnormalindex];
+				  for (i=0 ; i < nverts; i++, v++, ov++, lerp+=LERPSIZE)
+				  {
+						float l = shadedots[verts[i].lightnormalindex];
 
-                        vArray[i].data[0] = l * shadelight[0];
-                        vArray[i].data[1] = l * shadelight[1];
-                        vArray[i].data[2] = l * shadelight[2];
-                        lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
-                  }
+						vArray[i].data[0] = l * shadelight[0];
+						vArray[i].data[1] = l * shadelight[1];
+						vArray[i].data[2] = l * shadelight[2];
+						lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0]; 
+						lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1]; 
+						lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2]; 
+				  }
 		  }
-        } 
+		} 
    }
    else
    {
-        //PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-        { 
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE ) 
-                { 
-                        const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
+		//PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+		{ 
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE ) 
+				{ 
+						const float *normal = r_avertexnormals[verts[i].lightnormalindex]; 
  
-                        lerp[0] = move[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
-                        lerp[1] = move[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
-                        lerp[2] = move[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
-                } 
-        } 
-        else 
-        {
-              if( !gl_smoothmodels->value )
-              {
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
-                { 
-                        lerp[0] = move[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = move[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = move[2] + v->v[2]*frontv[2];
-                }
-              } 
-              else if( gl_vertex_arrays->value )
-              {
-                ULONG r,g,b,a;
-                const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
+						lerp[0] = move[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE; 
+						lerp[1] = move[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE; 
+						lerp[2] = move[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE;  
+				} 
+		} 
+		else 
+		{
+			  if( !gl_smoothmodels->value )
+			  {
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
+				{ 
+						lerp[0] = move[0] + v->v[0]*frontv[0]; 
+						lerp[1] = move[1] + v->v[1]*frontv[1]; 
+						lerp[2] = move[2] + v->v[2]*frontv[2];
+				}
+			  } 
+			  else if( gl_vertex_arrays->value )
+			  {
+				ULONG r,g,b,a;
+				const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
 
-                if (currententity->flags & RF_TRANSLUCENT)
-                  a = ((GLuint)(currententity->alpha * 255.f)) << 24;
-                else
-                  a = 0xFF000000;
+				if (currententity->flags & RF_TRANSLUCENT)
+				  a = ((GLuint)(currententity->alpha * 255.f)) << 24;
+				else
+				  a = 0xFF000000;
  
-                shadelight[0] *= 255.f;
-                shadelight[1] *= 255.f;
-                shadelight[2] *= 255.f;
+				shadelight[0] *= 255.f;
+				shadelight[1] *= 255.f;
+				shadelight[2] *= 255.f;
 
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
-                {
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
+				{
 			  ULONG argb = a;
  
-                        float l = shadedots[verts[i].lightnormalindex];
+						float l = shadedots[verts[i].lightnormalindex];
 
-                        r = l * shadelight[0];
-                        g = l * shadelight[1];
-                        b = l * shadelight[2];
+						r = l * shadelight[0];
+						g = l * shadelight[1];
+						b = l * shadelight[2];
  
-                        if(r > 0x000000FF) r = 0x00FF0000;
-                        else r <<= 16;
-                        if(g > 0x000000FF) g = 0x0000FF00;
-                        else g <<= 8;
-                        if(b > 0x000000FF) b = 0x000000FF;
+						if(r > 0x000000FF) r = 0x00FF0000;
+						else r <<= 16;
+						if(g > 0x000000FF) g = 0x0000FF00;
+						else g <<= 8;
+						if(b > 0x000000FF) b = 0x000000FF;
 
 #ifdef AMIGA_VOLATILE_ARRAYS
 			  ((ULONG*)lerp)[C_UBYTE] = a|r|g|b;
 #else 
-                        vArray[i].color = a|r|g|b;
+						vArray[i].color = a|r|g|b;
 #endif
-                        lerp[0] = move[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = move[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = move[2] + v->v[2]*frontv[2]; 
-                } 
-              }
-              else
-              {
-                  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
-                for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
-                  { 
-                        float l = shadedots[verts[i].lightnormalindex];
+						lerp[0] = move[0] + v->v[0]*frontv[0]; 
+						lerp[1] = move[1] + v->v[1]*frontv[1]; 
+						lerp[2] = move[2] + v->v[2]*frontv[2]; 
+				} 
+			  }
+			  else
+			  {
+				  const float  *shadedots = r_avertexnormal_dots[((int)(currententity->angles[YAW] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)]; 
+				for (i=0 ; i < nverts; i++, v++, lerp+=LERPSIZE) 
+				  { 
+						float l = shadedots[verts[i].lightnormalindex];
 
-                        vArray[i].data[0] = l * shadelight[0];
-                        vArray[i].data[1] = l * shadelight[1];
-                        vArray[i].data[2] = l * shadelight[2];
-                        lerp[0] = move[0] + v->v[0]*frontv[0]; 
-                        lerp[1] = move[1] + v->v[1]*frontv[1]; 
-                        lerp[2] = move[2] + v->v[2]*frontv[2]; 
-                  } 
-              }
-        } 
+						vArray[i].data[0] = l * shadelight[0];
+						vArray[i].data[1] = l * shadelight[1];
+						vArray[i].data[2] = l * shadelight[2];
+						lerp[0] = move[0] + v->v[0]*frontv[0]; 
+						lerp[1] = move[1] + v->v[1]*frontv[1]; 
+						lerp[2] = move[2] + v->v[2]*frontv[2]; 
+				  } 
+			  }
+		} 
    } 
 } 
 
@@ -518,7 +518,8 @@ static void GL_SetVertexArrayPointers (void)
 #else
 
    glTexCoordPointer( 3, GL_FLOAT, sizeof(varray_t), (void*)vArray->data );
-   glColorPointer( 4, MGL_UBYTE_ARGB, sizeof(varray_t), (void*)&vArray->color ); 
+   //glColorPointer( 4, MGL_UBYTE_ARGB, sizeof(varray_t), (void*)&vArray->color );
+   glColorPointer( 4, MGL_UBYTE_BGRA, sizeof(varray_t), (void*)&vArray->color );
    glVertexPointer( 3, GL_FLOAT, 4*sizeof(float), (void*)s_lerped );
 
 #endif
@@ -535,103 +536,103 @@ static UWORD   *vaindices[1024];
 
 void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp) 
 { 
-        float   l; 
-        daliasframe_t   *frame, *oldframe; 
-        dtrivertx_t     *v, *ov, *verts; 
-        int             *order; 
-        int             count; 
-        float   frontlerp; 
-        float   alpha; 
-        vec3_t  move, delta, vectors[3]; 
-        vec3_t  frontv, backv; 
-        int           i; 
-        int           index_xyz; 
-        GLfloat       *lerp; 
+		float   l; 
+		daliasframe_t   *frame, *oldframe; 
+		dtrivertx_t     *v, *ov, *verts; 
+		int             *order; 
+		int             count; 
+		float   frontlerp; 
+		float   alpha; 
+		vec3_t  move, delta, vectors[3]; 
+		vec3_t  frontv, backv; 
+		int           i; 
+		int           index_xyz; 
+		GLfloat       *lerp; 
  
-        if(va_is_enabled == false)
-        {
-              va_is_enabled = true;
+		if(va_is_enabled == false)
+		{
+			  va_is_enabled = true;
 
-              GL_SetVertexArrayPointers();
-        }
+			  GL_SetVertexArrayPointers();
+		}
 
-        frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
-                + currententity->frame * paliashdr->framesize); 
-        verts = v = frame->verts; 
+		frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
+				+ currententity->frame * paliashdr->framesize); 
+		verts = v = frame->verts; 
 
-        if(backlerp != 0.0) //surgeon
-        {
-          oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames + currententity->oldframe * paliashdr->framesize); 
-          ov = oldframe->verts; 
-        }
-        else
-        {
-          ov = NULL;
-        }
+		if(backlerp != 0.0) //surgeon
+		{
+		  oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames + currententity->oldframe * paliashdr->framesize); 
+		  ov = oldframe->verts; 
+		}
+		else
+		{
+		  ov = NULL;
+		}
 
-        order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
+		order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
  
-        if (currententity->flags & RF_TRANSLUCENT) 
-                alpha = currententity->alpha; 
-        else 
-                alpha = 1.0; 
+		if (currententity->flags & RF_TRANSLUCENT) 
+				alpha = currententity->alpha; 
+		else 
+				alpha = 1.0; 
 
-        // PMM - added double shell 
+		// PMM - added double shell 
 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-        { 
-                qglDisable( GL_TEXTURE_2D );
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+		{ 
+				qglDisable( GL_TEXTURE_2D );
  
-                if(gl_smoothmodels->value)
-                qglShadeModel( GL_FLAT );
-        }
-        else if ( gl_vertex_arrays->value )
-        {
-                glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+				if(gl_smoothmodels->value)
+				qglShadeModel( GL_FLAT );
+		}
+		else if ( gl_vertex_arrays->value )
+		{
+				glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-                if(gl_smoothmodels->value)
-                glEnableClientState( GL_COLOR_ARRAY );
-        }
+				if(gl_smoothmodels->value)
+				glEnableClientState( GL_COLOR_ARRAY );
+		}
 
-        if(backlerp != 0.0) //surgeon
-        { 
-           frontlerp = 1.0 - backlerp; 
+		if(backlerp != 0.0) //surgeon
+		{ 
+		   frontlerp = 1.0 - backlerp; 
  
-           // move should be the delta back to the previous frame * backlerp 
+		   // move should be the delta back to the previous frame * backlerp 
 
-           VectorSubtract (currententity->oldorigin, currententity->origin, delta); 
-           AngleVectors (currententity->angles, vectors[0], vectors[1], vectors[2]); 
+		   VectorSubtract (currententity->oldorigin, currententity->origin, delta); 
+		   AngleVectors (currententity->angles, vectors[0], vectors[1], vectors[2]); 
  
-           move[0] = DotProduct (delta, vectors[0]);       // forward 
-           move[1] = -DotProduct (delta, vectors[1]);      // left 
-           move[2] = DotProduct (delta, vectors[2]);       // up 
-           VectorAdd (move, oldframe->translate, move); 
+		   move[0] = DotProduct (delta, vectors[0]);       // forward 
+		   move[1] = -DotProduct (delta, vectors[1]);      // left 
+		   move[2] = DotProduct (delta, vectors[2]);       // up 
+		   VectorAdd (move, oldframe->translate, move); 
  
-           for (i=0 ; i<3 ; i++) 
-           { 
-                move[i] = backlerp*move[i] + frontlerp*frame->translate[i]; 
-           } 
+		   for (i=0 ; i<3 ; i++) 
+		   { 
+				move[i] = backlerp*move[i] + frontlerp*frame->translate[i]; 
+		   } 
  
-           for (i=0 ; i<3 ; i++) 
-           { 
-                frontv[i] = frontlerp*frame->scale[i]; 
-                backv[i] = backlerp*oldframe->scale[i]; 
-           } 
-        }
-        else
-        {
-           for (i=0 ; i<3 ; i++) 
-           { 
-                move[i] = frame->translate[i]; 
-                frontv[i] = frame->scale[i]; 
-           } 
-        }
+		   for (i=0 ; i<3 ; i++) 
+		   { 
+				frontv[i] = frontlerp*frame->scale[i]; 
+				backv[i] = backlerp*oldframe->scale[i]; 
+		   } 
+		}
+		else
+		{
+		   for (i=0 ; i<3 ; i++) 
+		   { 
+				move[i] = frame->translate[i]; 
+				frontv[i] = frame->scale[i]; 
+		   } 
+		}
 
-        qglTranslatef (move[0], move[1], move[2]); //surgeon: optimization
+		qglTranslatef (move[0], move[1], move[2]); //surgeon: optimization
 
-        lerp = s_lerped[0]; 
+		lerp = s_lerped[0]; 
 
-        GL_LerpVerts_notrans( paliashdr->num_xyz, v, ov, verts, lerp, frontv, backv ); 
+		GL_LerpVerts_notrans( paliashdr->num_xyz, v, ov, verts, lerp, frontv, backv ); 
 
 	  if(gl_shadows->value)
 	  {
@@ -642,449 +643,457 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 		#endif
 	  }
 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-        {
-                qglColor4f(shadelight[0], shadelight[1], shadelight[2], alpha);
-        }
-        else if(!gl_smoothmodels->value)
-        {
-                float r,g,b;
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+		{
+				qglColor4f(shadelight[0], shadelight[1], shadelight[2], alpha);
+		}
+		else if(!gl_smoothmodels->value)
+		{
+				float r,g,b;
 
-                r = shadelight[0] * 1.2;
-                g = shadelight[1] * 1.2;
-                b = shadelight[2] * 1.2;
+				r = shadelight[0] * 1.2;
+				g = shadelight[1] * 1.2;
+				b = shadelight[2] * 1.2;
 
-                qglColor4f(r, g, b, alpha);
-        }
+				qglColor4f(r, g, b, alpha);
+		}
 	  else if( !gl_vertex_arrays->value )
-        {
-                qglColor4f(1, 1, 1, alpha);
-        }
+		{
+				qglColor4f(1, 1, 1, alpha);
+		}
 
-        if ( gl_vertex_arrays->value ) 
-        {
-           GLenum         curprim; 
-           int            pcount;
-           UWORD          *idx;
+		if ( gl_vertex_arrays->value ) 
+		{
+		   GLenum         curprim; 
+		   int            pcount;
+		   UWORD          *idx;
   
-           glEnableClientState(GL_VERTEX_ARRAY);
-           glLockArrays( 0, paliashdr->num_xyz );
+		   glEnableClientState(GL_VERTEX_ARRAY);
+		   glLockArraysEXT( 0, paliashdr->num_xyz );
 
-           pcount = 0;
-           idx    = vaindex;
+		   pcount = 0;
+		   idx    = vaindex;
 
-           while (1) 
-           { 
-           // get the vertex count and primitive type
+		   while (1) 
+		   { 
+		   // get the vertex count and primitive type
  
-                count = *order++;
+				count = *order++;
  
-                if (!count) 
-                        break;          // done
+				if (!count) 
+						break;          // done
 
-                if (count < 0) 
-                { 
-                        count = -count; 
-                        curprim = GL_TRIANGLE_FAN; 
-                }  
-                else 
-                { 
-                        curprim = GL_TRIANGLE_STRIP; 
-                }
+				if (count < 0) 
+				{ 
+						count = -count; 
+						curprim = GL_TRIANGLE_FAN; 
+				}  
+				else 
+				{ 
+						curprim = GL_TRIANGLE_STRIP; 
+				}
 
-                if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-                {
-                   primtype[pcount]  = curprim;
-                   vcount[pcount]    = count;
-                   vaindices[pcount] = idx;
-                   pcount++;
+				if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+				{
+				   primtype[pcount]  = curprim;
+				   vcount[pcount]    = count;
+				   vaindices[pcount] = idx;
+				   pcount++;
 
-                   do 
-                   {
-                        *idx++ = (UWORD)order[2];
-                        order += 3; 
+				   do 
+				   {
+						*idx++ = (UWORD)order[2];
+						order += 3; 
  
-                   } while (--count);
-                }
-                else
-                {
-                   vcount[0] = count;
-                   idx       = vaindex;
+				   } while (--count);
 
-                   do 
-                   {
-                        index_xyz = order[2];
-#ifdef AMIGA_VOLATILE_ARRAYS
-                        ((float *)(s_lerped[index_xyz]))[S_COORD] = ((float *)order)[0];
-                        ((float *)(s_lerped[index_xyz]))[T_COORD] = ((float *)order)[1];
-#else
-                        vArray[index_xyz].data[0] = ((float *)order)[0];
-                        vArray[index_xyz].data[1] = ((float *)order)[1];
+#ifdef __amigaos4__
+					glDrawElements(curprim, vcount[pcount], GL_UNSIGNED_SHORT, vaindices[pcount]);
 #endif
-                        *idx++ = (UWORD)index_xyz;
+				
+				}
+				else
+				{
+				   vcount[0] = count;
+				   idx       = vaindex;
 
-                        order += 3;
+				   do 
+				   {
+						index_xyz = order[2];
+#ifdef AMIGA_VOLATILE_ARRAYS
+						((float *)(s_lerped[index_xyz]))[S_COORD] = ((float *)order)[0];
+						((float *)(s_lerped[index_xyz]))[T_COORD] = ((float *)order)[1];
+#else
+						vArray[index_xyz].data[0] = ((float *)order)[0];
+						vArray[index_xyz].data[1] = ((float *)order)[1];
+#endif
+						*idx++ = (UWORD)index_xyz;
+
+						order += 3;
  
-                   } while (--count);
+				   } while (--count);
 
-                   glDrawElements( curprim, vcount[0], GL_UNSIGNED_SHORT, (void *)vaindex);
-                }
-           }
+				   glDrawElements( curprim, vcount[0], GL_UNSIGNED_SHORT, (void *)vaindex);
+				}
+		   }
 
-           if(pcount)
-           {
-                mglMultiModeDrawElements( primtype, vcount, GL_UNSIGNED_SHORT, (void **)vaindices, pcount );
-           }
+#ifndef __amigaos4__
+		   if(pcount)
+		   {
+				glMultiModeDrawElementsIBM( primtype, vcount, GL_UNSIGNED_SHORT, (void **)vaindices, pcount );
+		   }
 
-           glUnlockArrays();
-           glDisableClientState( GL_VERTEX_ARRAY );
+//TODO!
+#endif
+		   glUnlockArraysEXT();
+		   glDisableClientState( GL_VERTEX_ARRAY );
 
-           if ( !( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) )
-           {
-                glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+		   if ( !( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) )
+		   {
+				glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
-                if(gl_smoothmodels->value);
-                   glDisableClientState (GL_COLOR_ARRAY);
-           }
-        } 
-        else 
-        {
-           while (1) 
-           { 
-                // get the vertex count and primitive type 
-                count = *order++; 
+				if(gl_smoothmodels->value);
+				   glDisableClientState (GL_COLOR_ARRAY);
+		   }
+		} 
+		else 
+		{
+		   while (1) 
+		   { 
+				// get the vertex count and primitive type 
+				count = *order++; 
 
-                if (!count) 
-                        break;          // done 
+				if (!count) 
+						break;          // done 
 
-                if (count < 0) 
-                { 
-                        count = -count; 
-                        qglBegin (GL_TRIANGLE_FAN); 
-                } 
-                else 
-                { 
-                        qglBegin (GL_TRIANGLE_STRIP); 
-                } 
+				if (count < 0) 
+				{ 
+						count = -count; 
+						qglBegin (GL_TRIANGLE_FAN); 
+				} 
+				else 
+				{ 
+						qglBegin (GL_TRIANGLE_STRIP); 
+				} 
  
-                if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-                { 
-                        do 
-                        { 
-                                index_xyz = order[2]; 
-                                order += 3; 
+				if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+				{ 
+						do 
+						{ 
+								index_xyz = order[2]; 
+								order += 3; 
 
-                                qglVertex3fv (s_lerped[index_xyz]); 
-                        } while (--count); 
-                } 
-                else if(gl_smoothmodels->value)
-                {
-                        do 
-                        { 
-                                // texture coordinates come from the draw list
-                                qglTexCoord2fv((float *)order); 
-                                index_xyz = order[2]; 
-                                order += 3;
+								qglVertex3fv (s_lerped[index_xyz]); 
+						} while (--count); 
+				} 
+				else if(gl_smoothmodels->value)
+				{
+						do 
+						{ 
+								// texture coordinates come from the draw list
+								qglTexCoord2fv((float *)order); 
+								index_xyz = order[2]; 
+								order += 3;
  
-                                qglColor3fv (vArray[index_xyz].data);
-                                qglVertex3fv (s_lerped[index_xyz]);
+								qglColor3fv (vArray[index_xyz].data);
+								qglVertex3fv (s_lerped[index_xyz]);
 
-                        } while (--count); 
-                }
-                else
-                {
-                        do 
-                        { 
-                                // texture coordinates come from the draw list 
-                                qglTexCoord2fv((float *)order); 
+						} while (--count); 
+				}
+				else
+				{
+						do 
+						{ 
+								// texture coordinates come from the draw list 
+								qglTexCoord2fv((float *)order); 
 
-                                index_xyz = order[2]; 
-                                order += 3;
+								index_xyz = order[2]; 
+								order += 3;
  
-                                qglVertex3fv (s_lerped[index_xyz]);
-                        } while (--count); 
-                }
+								qglVertex3fv (s_lerped[index_xyz]);
+						} while (--count); 
+				}
  
-                qglEnd (); 
-           } 
-        } 
+				qglEnd (); 
+		   } 
+		} 
 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-        { 
-                qglEnable( GL_TEXTURE_2D ); 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+		{ 
+				qglEnable( GL_TEXTURE_2D ); 
 
-                if( gl_smoothmodels->value )
-                qglShadeModel( GL_SMOOTH );
-        }
+				if( gl_smoothmodels->value )
+				qglShadeModel( GL_SMOOTH );
+		}
 }
 
 #else //tested okay
 
 void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp) 
 { 
-        float   l; 
-        daliasframe_t   *frame, *oldframe; 
-        dtrivertx_t     *v, *ov, *verts; 
-        int             *order; 
-        int             count; 
-        float   frontlerp; 
-        float   alpha; 
-        vec3_t  move, delta, vectors[3]; 
-        vec3_t  frontv, backv;
-        int             i; 
-        int             index_xyz; 
-        GLfloat   *lerp; 
+		float   l; 
+		daliasframe_t   *frame, *oldframe; 
+		dtrivertx_t     *v, *ov, *verts; 
+		int             *order; 
+		int             count; 
+		float   frontlerp; 
+		float   alpha; 
+		vec3_t  move, delta, vectors[3]; 
+		vec3_t  frontv, backv;
+		int             i; 
+		int             index_xyz; 
+		GLfloat   *lerp; 
 
-        if(!va_is_enabled)
-        {
-                GL_SetVertexArrayPointers();
-                va_is_enabled = true;
-        }
+		if(!va_is_enabled)
+		{
+				GL_SetVertexArrayPointers();
+				va_is_enabled = true;
+		}
 
-        frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
-                + currententity->frame * paliashdr->framesize); 
-        verts = v = frame->verts; 
+		frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
+				+ currententity->frame * paliashdr->framesize); 
+		verts = v = frame->verts; 
 
-        if(backlerp != 0.0) //surgeon
-        {
-          oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames + currententity->oldframe * paliashdr->framesize); 
-          ov = oldframe->verts; 
-        }
-        else
-        {
-          ov = NULL;
-        }
+		if(backlerp != 0.0) //surgeon
+		{
+		  oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames + currententity->oldframe * paliashdr->framesize); 
+		  ov = oldframe->verts; 
+		}
+		else
+		{
+		  ov = NULL;
+		}
 
-        order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
+		order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
  
-        if (currententity->flags & RF_TRANSLUCENT) 
-                alpha = currententity->alpha; 
-        else 
-                alpha = 1.0; 
+		if (currententity->flags & RF_TRANSLUCENT) 
+				alpha = currententity->alpha; 
+		else 
+				alpha = 1.0; 
 
-        // PMM - added double shell 
+		// PMM - added double shell 
 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-        { 
-                qglDisable( GL_TEXTURE_2D );
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+		{ 
+				qglDisable( GL_TEXTURE_2D );
  
-                if(gl_smoothmodels->value)
-                qglShadeModel( GL_FLAT );
-        }
-        else if ( gl_vertex_arrays->value )
-        { 
-                glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+				if(gl_smoothmodels->value)
+				qglShadeModel( GL_FLAT );
+		}
+		else if ( gl_vertex_arrays->value )
+		{ 
+				glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-                if(gl_smoothmodels->value)
-                glEnableClientState( GL_COLOR_ARRAY );
-        }
+				if(gl_smoothmodels->value)
+				glEnableClientState( GL_COLOR_ARRAY );
+		}
 
 
-        if(backlerp != 0.0) //surgeon
-        { 
-           frontlerp = 1.0 - backlerp; 
+		if(backlerp != 0.0) //surgeon
+		{ 
+		   frontlerp = 1.0 - backlerp; 
  
-           // move should be the delta back to the previous frame * backlerp 
+		   // move should be the delta back to the previous frame * backlerp 
 
-           VectorSubtract (currententity->oldorigin, currententity->origin, delta); 
-           AngleVectors (currententity->angles, vectors[0], vectors[1], vectors[2]); 
+		   VectorSubtract (currententity->oldorigin, currententity->origin, delta); 
+		   AngleVectors (currententity->angles, vectors[0], vectors[1], vectors[2]); 
  
-           move[0] = DotProduct (delta, vectors[0]);       // forward 
-           move[1] = -DotProduct (delta, vectors[1]);      // left 
-           move[2] = DotProduct (delta, vectors[2]);       // up 
-           VectorAdd (move, oldframe->translate, move); 
+		   move[0] = DotProduct (delta, vectors[0]);       // forward 
+		   move[1] = -DotProduct (delta, vectors[1]);      // left 
+		   move[2] = DotProduct (delta, vectors[2]);       // up 
+		   VectorAdd (move, oldframe->translate, move); 
  
-           for (i=0 ; i<3 ; i++) 
-           { 
-                move[i] = backlerp*move[i] + frontlerp*frame->translate[i]; 
-           } 
+		   for (i=0 ; i<3 ; i++) 
+		   { 
+				move[i] = backlerp*move[i] + frontlerp*frame->translate[i]; 
+		   } 
  
-           for (i=0 ; i<3 ; i++) 
-           { 
-                frontv[i] = frontlerp*frame->scale[i]; 
-                backv[i] = backlerp*oldframe->scale[i]; 
-           } 
-        }
-        else
-        {
-           for (i=0 ; i<3 ; i++) 
-           { 
-                move[i] = frame->translate[i]; 
-                frontv[i] = frame->scale[i]; 
-           } 
-        }
+		   for (i=0 ; i<3 ; i++) 
+		   { 
+				frontv[i] = frontlerp*frame->scale[i]; 
+				backv[i] = backlerp*oldframe->scale[i]; 
+		   } 
+		}
+		else
+		{
+		   for (i=0 ; i<3 ; i++) 
+		   { 
+				move[i] = frame->translate[i]; 
+				frontv[i] = frame->scale[i]; 
+		   } 
+		}
 
-        lerp = s_lerped[0];
+		lerp = s_lerped[0];
 
-        GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv ); 
+		GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv ); 
 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-        {
-                qglColor4f(shadelight[0], shadelight[1], shadelight[2], alpha);
-        }
-        else if(!gl_smoothmodels->value)
-        {
-                static float r,g,b;
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+		{
+				qglColor4f(shadelight[0], shadelight[1], shadelight[2], alpha);
+		}
+		else if(!gl_smoothmodels->value)
+		{
+				static float r,g,b;
 
-                r = shadelight[0] * 1.2;
-                g = shadelight[1] * 1.2;
-                b = shadelight[2] * 1.2;
+				r = shadelight[0] * 1.2;
+				g = shadelight[1] * 1.2;
+				b = shadelight[2] * 1.2;
 
-                qglColor4f(r, g, b, alpha);
-        }
+				qglColor4f(r, g, b, alpha);
+		}
 	  else if(!gl_vertex_arrays->value)
-        {
-                qglColor4f(1, 1, 1, alpha);
-        }
+		{
+				qglColor4f(1, 1, 1, alpha);
+		}
 
 
-        if ( gl_vertex_arrays->value ) 
-        {
-        static UWORD vaindex[512];
-        static ULONG vcount;
-        static GLenum primtype; 
-        UWORD *idx;
+		if ( gl_vertex_arrays->value ) 
+		{
+		static UWORD vaindex[512];
+		static ULONG vcount;
+		static GLenum primtype; 
+		UWORD *idx;
 
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glLockArrays( 0, paliashdr->num_xyz );
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glLockArraysEXT( 0, paliashdr->num_xyz );
 
 
-                while (1) 
-                { 
-                // get the vertex count and primitive type
+				while (1) 
+				{ 
+				// get the vertex count and primitive type
  
-                        count = *order++;
+						count = *order++;
  
-                        if (!count) 
-                                break;          // done
+						if (!count) 
+								break;          // done
  
-                        if (count < 0) 
-                        { 
-                                count = -count; 
-                                //qglBegin (GL_TRIANGLE_FAN); 
-                                primtype = GL_TRIANGLE_FAN; 
-                        } 
-                        else 
-                        { 
-                                //qglBegin (GL_TRIANGLE_STRIP); 
-                                primtype = GL_TRIANGLE_STRIP; 
-                        } 
+						if (count < 0) 
+						{ 
+								count = -count; 
+								//qglBegin (GL_TRIANGLE_FAN); 
+								primtype = GL_TRIANGLE_FAN; 
+						} 
+						else 
+						{ 
+								//qglBegin (GL_TRIANGLE_STRIP); 
+								primtype = GL_TRIANGLE_STRIP; 
+						} 
 
-                        idx = &vaindex[0];
-                        vcount = count;
+						idx = &vaindex[0];
+						vcount = count;
 
-                        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-                        {
-                                do 
-                                {
-                                *idx++ = (UWORD)order[2];
+						if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+						{
+								do 
+								{
+								*idx++ = (UWORD)order[2];
 
-                                //qglArrayElement(order[2]);
-                                order += 3; 
+								//qglArrayElement(order[2]);
+								order += 3; 
  
-                                } while (--count);
-                        } 
-                        else 
-                        {
-                                do 
-                                { 
-                                // texture coordinates come from the draw list
+								} while (--count);
+						} 
+						else 
+						{
+								do 
+								{ 
+								// texture coordinates come from the draw list
 
-                                index_xyz = order[2];
+								index_xyz = order[2];
  
-                                vArray[index_xyz].data[0] = ((float *)order)[0];
-                                vArray[index_xyz].data[1] = ((float *)order)[1];
-                                *idx++ = (UWORD)index_xyz;
+								vArray[index_xyz].data[0] = ((float *)order)[0];
+								vArray[index_xyz].data[1] = ((float *)order)[1];
+								*idx++ = (UWORD)index_xyz;
  
-                                //qglTexCoord2fv((float *)order);
-                                //qglArrayElement(order[2]);
+								//qglTexCoord2fv((float *)order);
+								//qglArrayElement(order[2]);
 
-                                order += 3; 
+								order += 3; 
 
-                                } while (--count); 
-                        }
+								} while (--count); 
+						}
 
-                        glDrawElements( primtype, vcount, GL_UNSIGNED_SHORT, (void *)vaindex);
-                        //qglEnd();
+						glDrawElements( primtype, vcount, GL_UNSIGNED_SHORT, (void *)vaindex);
+						//qglEnd();
 
-                }
+				}
 
-                glUnlockArrays();
-                glDisableClientState( GL_VERTEX_ARRAY );
+				glUnlockArraysEXT();
+				glDisableClientState( GL_VERTEX_ARRAY );
 
-                if ( !( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) ) 
-                {
-                   glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+				if ( !( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) ) 
+				{
+				   glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 
-                   if(gl_smoothmodels->value);
-                   glDisableClientState( GL_COLOR_ARRAY );
-                }
-        } 
-        else 
-        {
-                while (1) 
-                { 
-                        // get the vertex count and primitive type 
-                        count = *order++; 
-                        if (!count) 
-                                break;          // done 
-                        if (count < 0) 
-                        { 
-                                count = -count; 
-                                qglBegin (GL_TRIANGLE_FAN); 
-                        } 
-                        else 
-                        { 
-                                qglBegin (GL_TRIANGLE_STRIP); 
-                        } 
+				   if(gl_smoothmodels->value);
+				   glDisableClientState( GL_COLOR_ARRAY );
+				}
+		} 
+		else 
+		{
+				while (1) 
+				{ 
+						// get the vertex count and primitive type 
+						count = *order++; 
+						if (!count) 
+								break;          // done 
+						if (count < 0) 
+						{ 
+								count = -count; 
+								qglBegin (GL_TRIANGLE_FAN); 
+						} 
+						else 
+						{ 
+								qglBegin (GL_TRIANGLE_STRIP); 
+						} 
  
-                        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM ) ) 
-                        { 
-                                do 
-                                { 
-                                        index_xyz = order[2]; 
-                                        order += 3; 
+						if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM ) ) 
+						{ 
+								do 
+								{ 
+										index_xyz = order[2]; 
+										order += 3; 
  
-                                        qglVertex3fv (s_lerped[index_xyz]); 
+										qglVertex3fv (s_lerped[index_xyz]); 
  
-                                } while (--count); 
-                        } 
-                        else if(gl_smoothmodels->value)
-                        {
-                                do 
-                                { 
-                                        // texture coordinates come from the draw list 
-                                        qglTexCoord2fv((float *)order); 
-                                        index_xyz = order[2]; 
-                                        order += 3;
+								} while (--count); 
+						} 
+						else if(gl_smoothmodels->value)
+						{
+								do 
+								{ 
+										// texture coordinates come from the draw list 
+										qglTexCoord2fv((float *)order); 
+										index_xyz = order[2]; 
+										order += 3;
  
-                                        qglColor3fv (vArray[index_xyz].data);
-                                        qglVertex3fv (s_lerped[index_xyz]); 
-                                } while (--count); 
-                        }
-                        else
-                        {
-                                do 
-                                { 
-                                        // texture coordinates come from the draw list 
-                                        qglTexCoord2fv ((float *)order); 
-                                        index_xyz = order[2]; 
-                                        order += 3;
+										qglColor3fv (vArray[index_xyz].data);
+										qglVertex3fv (s_lerped[index_xyz]); 
+								} while (--count); 
+						}
+						else
+						{
+								do 
+								{ 
+										// texture coordinates come from the draw list 
+										qglTexCoord2fv ((float *)order); 
+										index_xyz = order[2]; 
+										order += 3;
  
-                                        qglVertex3fv (s_lerped[index_xyz]); 
-                                } while (--count); 
-                        } 
-                        qglEnd (); 
-                } 
-        } 
+										qglVertex3fv (s_lerped[index_xyz]); 
+								} while (--count); 
+						} 
+						qglEnd (); 
+				} 
+		} 
 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-        { 
-                qglEnable( GL_TEXTURE_2D ); 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+		{ 
+				qglEnable( GL_TEXTURE_2D ); 
 
-                if( gl_smoothmodels->value )
-                qglShadeModel( GL_SMOOTH );
-        }
+				if( gl_smoothmodels->value )
+				qglShadeModel( GL_SMOOTH );
+		}
 }
 #endif
  
@@ -1092,205 +1101,205 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 
 void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp) 
 { 
-        float   l; 
-        daliasframe_t   *frame, *oldframe; 
-        dtrivertx_t     *v, *ov, *verts; 
-        int             *order; 
-        int             count; 
-        float   frontlerp; 
-        float   alpha; 
-        vec3_t  move, delta, vectors[3]; 
-        vec3_t  frontv, backv; 
-        int             i; 
-        int             index_xyz; 
-        float   *lerp; 
+		float   l; 
+		daliasframe_t   *frame, *oldframe; 
+		dtrivertx_t     *v, *ov, *verts; 
+		int             *order; 
+		int             count; 
+		float   frontlerp; 
+		float   alpha; 
+		vec3_t  move, delta, vectors[3]; 
+		vec3_t  frontv, backv; 
+		int             i; 
+		int             index_xyz; 
+		float   *lerp; 
  
-        frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
-                + currententity->frame * paliashdr->framesize); 
-        verts = v = frame->verts; 
+		frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
+				+ currententity->frame * paliashdr->framesize); 
+		verts = v = frame->verts; 
  
-        oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
-                + currententity->oldframe * paliashdr->framesize); 
-        ov = oldframe->verts; 
+		oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
+				+ currententity->oldframe * paliashdr->framesize); 
+		ov = oldframe->verts; 
  
-        order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
+		order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
  
 //      glTranslatef (frame->translate[0], frame->translate[1], frame->translate[2]); 
 //      glScalef (frame->scale[0], frame->scale[1], frame->scale[2]); 
  
-        if (currententity->flags & RF_TRANSLUCENT) 
-                alpha = currententity->alpha; 
-        else 
-                alpha = 1.0; 
+		if (currententity->flags & RF_TRANSLUCENT) 
+				alpha = currententity->alpha; 
+		else 
+				alpha = 1.0; 
 
-        // PMM - added double shell 
+		// PMM - added double shell 
 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-                qglDisable( GL_TEXTURE_2D ); 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+				qglDisable( GL_TEXTURE_2D ); 
  
-        frontlerp = 1.0 - backlerp; 
+		frontlerp = 1.0 - backlerp; 
  
-        // move should be the delta back to the previous frame * backlerp 
-        VectorSubtract (currententity->oldorigin, currententity->origin, delta); 
-        AngleVectors (currententity->angles, vectors[0], vectors[1], vectors[2]); 
+		// move should be the delta back to the previous frame * backlerp 
+		VectorSubtract (currententity->oldorigin, currententity->origin, delta); 
+		AngleVectors (currententity->angles, vectors[0], vectors[1], vectors[2]); 
  
-        move[0] = DotProduct (delta, vectors[0]);       // forward 
-        move[1] = -DotProduct (delta, vectors[1]);      // left 
-        move[2] = DotProduct (delta, vectors[2]);       // up 
+		move[0] = DotProduct (delta, vectors[0]);       // forward 
+		move[1] = -DotProduct (delta, vectors[1]);      // left 
+		move[2] = DotProduct (delta, vectors[2]);       // up 
  
-        VectorAdd (move, oldframe->translate, move); 
+		VectorAdd (move, oldframe->translate, move); 
  
-        for (i=0 ; i<3 ; i++) 
-        { 
-                move[i] = backlerp*move[i] + frontlerp*frame->translate[i]; 
-        } 
+		for (i=0 ; i<3 ; i++) 
+		{ 
+				move[i] = backlerp*move[i] + frontlerp*frame->translate[i]; 
+		} 
  
-        for (i=0 ; i<3 ; i++) 
-        { 
-                frontv[i] = frontlerp*frame->scale[i]; 
-                backv[i] = backlerp*oldframe->scale[i]; 
-        } 
+		for (i=0 ; i<3 ; i++) 
+		{ 
+				frontv[i] = frontlerp*frame->scale[i]; 
+				backv[i] = backlerp*oldframe->scale[i]; 
+		} 
  
-        lerp = s_lerped[0]; 
+		lerp = s_lerped[0]; 
  
-        GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv ); 
+		GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv ); 
  
-        if ( gl_vertex_arrays->value ) 
-        { 
-                static float colorArray[MAX_VERTS*4]; 
+		if ( gl_vertex_arrays->value ) 
+		{ 
+				static float colorArray[MAX_VERTS*4]; 
  
-                qglEnableClientState( GL_VERTEX_ARRAY );
-                qglVertexPointer( 3, GL_FLOAT, 16, s_lerped ); // padded for SIMD
+				qglEnableClientState( GL_VERTEX_ARRAY );
+				qglVertexPointer( 3, GL_FLOAT, 16, s_lerped ); // padded for SIMD
 
-                // PMM - added double damage shell 
-                if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-                { 
-                        qglColor4f( shadelight[0], shadelight[1], shadelight[2], alpha ); 
-                } 
-                else 
-                { 
-                qglEnableClientState( GL_COLOR_ARRAY ); 
-                qglColorPointer( 3, GL_FLOAT, 0, colorArray ); 
+				// PMM - added double damage shell 
+				if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+				{ 
+						qglColor4f( shadelight[0], shadelight[1], shadelight[2], alpha ); 
+				} 
+				else 
+				{ 
+				qglEnableClientState( GL_COLOR_ARRAY ); 
+				qglColorPointer( 3, GL_FLOAT, 0, colorArray ); 
  
-                        // 
-                        // pre light everything 
-                        // 
-                        for ( i = 0; i < paliashdr->num_xyz; i++ ) 
-                        { 
-                                float l = shadedots[verts[i].lightnormalindex]; 
+						// 
+						// pre light everything 
+						// 
+						for ( i = 0; i < paliashdr->num_xyz; i++ ) 
+						{ 
+								float l = shadedots[verts[i].lightnormalindex]; 
  
-                                colorArray[i*3+0] = l * shadelight[0]; 
-                                colorArray[i*3+1] = l * shadelight[1]; 
-                                colorArray[i*3+2] = l * shadelight[2]; 
-                        } 
-                } 
+								colorArray[i*3+0] = l * shadelight[0]; 
+								colorArray[i*3+1] = l * shadelight[1]; 
+								colorArray[i*3+2] = l * shadelight[2]; 
+						} 
+				} 
  
-                if ( qglLockArraysEXT != 0 ) 
-                        qglLockArraysEXT( 0, paliashdr->num_xyz );
+				if ( qglLockArraysEXT != 0 ) 
+						qglLockArraysEXT( 0, paliashdr->num_xyz );
 
-                while (1) 
-                { 
-                        // get the vertex count and primitive type 
-                        count = *order++; 
-                        if (!count) 
-                                break;          // done 
-                        if (count < 0) 
-                        { 
-                                count = -count; 
-                                qglBegin (GL_TRIANGLE_FAN); 
-                        } 
-                        else 
-                        { 
-                                qglBegin (GL_TRIANGLE_STRIP); 
-                        } 
+				while (1) 
+				{ 
+						// get the vertex count and primitive type 
+						count = *order++; 
+						if (!count) 
+								break;          // done 
+						if (count < 0) 
+						{ 
+								count = -count; 
+								qglBegin (GL_TRIANGLE_FAN); 
+						} 
+						else 
+						{ 
+								qglBegin (GL_TRIANGLE_STRIP); 
+						} 
  
-                        // PMM - added double damage shell 
-                        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-                        {
-                                do 
-                                { 
-                                        index_xyz = order[2]; 
-                                        order += 3; 
+						// PMM - added double damage shell 
+						if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+						{
+								do 
+								{ 
+										index_xyz = order[2]; 
+										order += 3; 
  
-                                        qglVertex3fv( s_lerped[index_xyz] ); 
-                                } while (--count);
-                        } 
-                        else 
-                        { 
-                                do 
-                                { 
-                                        // texture coordinates come from the draw list
-                                index_xyz = order[2]; 
+										qglVertex3fv( s_lerped[index_xyz] ); 
+								} while (--count);
+						} 
+						else 
+						{ 
+								do 
+								{ 
+										// texture coordinates come from the draw list
+								index_xyz = order[2]; 
 
-                                qglTexCoord2f (((float *)order)[0], ((float *)order)[1]);
-                                order += 3; 
+								qglTexCoord2f (((float *)order)[0], ((float *)order)[1]);
+								order += 3; 
  
-                                glArrayElement( index_xyz ); 
+								glArrayElement( index_xyz ); 
  
-                                } while (--count); 
-                        }
-                        qglEnd (); 
-                } 
+								} while (--count); 
+						}
+						qglEnd (); 
+				} 
 
-                if ( qglUnlockArraysEXT != 0 ) 
-                        qglUnlockArraysEXT(); 
-        } 
-        else 
-        { 
-                while (1) 
-                { 
-                        // get the vertex count and primitive type 
-                        count = *order++; 
-                        if (!count) 
-                                break;          // done 
-                        if (count < 0) 
-                        { 
-                                count = -count; 
-                                qglBegin (GL_TRIANGLE_FAN); 
-                        } 
-                        else 
-                        { 
-                                qglBegin (GL_TRIANGLE_STRIP); 
-                        } 
+				if ( qglUnlockArraysEXT != 0 ) 
+						qglUnlockArraysEXT(); 
+		} 
+		else 
+		{ 
+				while (1) 
+				{ 
+						// get the vertex count and primitive type 
+						count = *order++; 
+						if (!count) 
+								break;          // done 
+						if (count < 0) 
+						{ 
+								count = -count; 
+								qglBegin (GL_TRIANGLE_FAN); 
+						} 
+						else 
+						{ 
+								qglBegin (GL_TRIANGLE_STRIP); 
+						} 
  
-                        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) ) 
-                        { 
-                                do 
-                                { 
-                                        index_xyz = order[2]; 
-                                        order += 3; 
+						if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) ) 
+						{ 
+								do 
+								{ 
+										index_xyz = order[2]; 
+										order += 3; 
  
-                                        qglColor4f( shadelight[0], shadelight[1], shadelight[2], alpha); 
-                                        qglVertex3fv (s_lerped[index_xyz]); 
+										qglColor4f( shadelight[0], shadelight[1], shadelight[2], alpha); 
+										qglVertex3fv (s_lerped[index_xyz]); 
  
-                                } while (--count); 
-                        } 
-                        else 
-                        { 
-                                do 
-                                { 
-                                        // texture coordinates come from the draw list 
-                                        qglTexCoord2f (((float *)order)[0], ((float *)order)[1]); 
-                                        index_xyz = order[2]; 
-                                        order += 3; 
+								} while (--count); 
+						} 
+						else 
+						{ 
+								do 
+								{ 
+										// texture coordinates come from the draw list 
+										qglTexCoord2f (((float *)order)[0], ((float *)order)[1]); 
+										index_xyz = order[2]; 
+										order += 3; 
  
-                                        // normals and vertexes come from the frame list 
-                                        l = shadedots[verts[index_xyz].lightnormalindex]; 
-                                         
-                                        qglColor4f (l* shadelight[0], l*shadelight[1], l*shadelight[2], alpha); 
-                                        qglVertex3fv (s_lerped[index_xyz]); 
-                                } while (--count); 
-                        } 
+										// normals and vertexes come from the frame list 
+										l = shadedots[verts[index_xyz].lightnormalindex]; 
+										 
+										qglColor4f (l* shadelight[0], l*shadelight[1], l*shadelight[2], alpha); 
+										qglVertex3fv (s_lerped[index_xyz]); 
+								} while (--count); 
+						} 
  
-                        qglEnd (); 
-                } 
-        } 
+						qglEnd (); 
+				} 
+		} 
  
 //      if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) )
  
-        // PMM - added double damage shell 
-        if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
-                qglEnable( GL_TEXTURE_2D ); 
+		// PMM - added double damage shell 
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) ) 
+				qglEnable( GL_TEXTURE_2D ); 
 }
 
 #endif 
@@ -1306,21 +1315,21 @@ extern  vec3_t                  lightspot;
  
 void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum) 
 { 
-        dtrivertx_t     *verts; 
-        int             *order; 
-        vec3_t  point; 
-        float   height, lheight; 
-        int             count; 
-        daliasframe_t   *frame; 
+		dtrivertx_t     *verts; 
+		int             *order; 
+		vec3_t  point; 
+		float   height, lheight; 
+		int             count; 
+		daliasframe_t   *frame; 
  
-        lheight = currententity->origin[2] - lightspot[2]; 
-        height = -lheight + 1.0; 
+		lheight = currententity->origin[2] - lightspot[2]; 
+		height = -lheight + 1.0; 
  
-        frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
-                + currententity->frame * paliashdr->framesize); 
-        verts = frame->verts; 
+		frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames  
+				+ currententity->frame * paliashdr->framesize); 
+		verts = frame->verts; 
  
-        order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
+		order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds); 
  
 
 #ifdef AMIGA
@@ -1344,10 +1353,10 @@ void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 		v[0] += shadetrans[0];
 		v[1] += shadetrans[1];
 
-        	v[0] -= shadevector[0]*(v[2]+lheight); 
-        	v[1] -= shadevector[1]*(v[2]+lheight); 
+			v[0] -= shadevector[0]*(v[2]+lheight); 
+			v[1] -= shadevector[1]*(v[2]+lheight); 
 
-        	v[2] = height; 
+			v[2] = height; 
 	  }
 	#endif
 
@@ -1359,44 +1368,51 @@ void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 
 	  glEnableClientState(GL_VERTEX_ARRAY);
 
-	  glLockArrays(0, paliashdr->num_xyz);
+	  glLockArraysEXT(0, paliashdr->num_xyz);
 
 	  pcount = 0;
 	  idx = vaindex;
 
-        while (1) 
-        { 
-                // get the vertex count and primitive type 
-                count = *order++; 
-                if (!count) 
-                        break;          // done
+		while (1) 
+		{ 
+				// get the vertex count and primitive type 
+				count = *order++; 
+				if (!count) 
+						break;          // done
  
-                if (count < 0) 
-                { 
-                        count = -count; 
-                        curprim = GL_TRIANGLE_FAN; 
-                } 
-                else
+				if (count < 0) 
+				{ 
+						count = -count; 
+						curprim = GL_TRIANGLE_FAN; 
+				} 
+				else
 		  { 
-                        curprim = GL_TRIANGLE_STRIP; 
+						curprim = GL_TRIANGLE_STRIP; 
 		  }
 
-                primtype[pcount]  = curprim;
-                vcount[pcount]    = count;
-                vaindices[pcount] = idx;
-                pcount++;
+				primtype[pcount]  = curprim;
+				vcount[pcount]    = count;
+				vaindices[pcount] = idx;
+				pcount++;
  
-                do 
-                { 
-                        *idx++ = (UWORD)order[2];
-                        order += 3; 
+				do 
+				{ 
+						*idx++ = (UWORD)order[2];
+						order += 3; 
  
-                } while (--count); 
-        }
+				} while (--count); 
 
-        mglMultiModeDrawElements( primtype, vcount, GL_UNSIGNED_SHORT, (void **)vaindices, pcount );
+#ifdef __amigaos4__
+			glDrawElements(curprim, vcount[pcount], GL_UNSIGNED_SHORT, vaindices[pcount]);
+#endif
 
-	  glUnlockArrays();
+		}
+#ifndef __amigaos4__
+		//TODO!
+		
+		mglMultiModeDrawElements( primtype, vcount, GL_UNSIGNED_SHORT, (void **)vaindices, pcount );
+#endif
+	  glUnlockArraysEXT();
 
 	  glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -1408,52 +1424,52 @@ void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 	else
 	{
 #endif
-        while (1) 
-        { 
-                // get the vertex count and primitive type 
-                count = *order++; 
-                if (!count) 
-                        break;          // done 
-                if (count < 0) 
-                { 
-                        count = -count; 
-                        qglBegin (GL_TRIANGLE_FAN); 
-                } 
-                else 
-                        qglBegin (GL_TRIANGLE_STRIP); 
+		while (1) 
+		{ 
+				// get the vertex count and primitive type 
+				count = *order++; 
+				if (!count) 
+						break;          // done 
+				if (count < 0) 
+				{ 
+						count = -count; 
+						qglBegin (GL_TRIANGLE_FAN); 
+				} 
+				else 
+						qglBegin (GL_TRIANGLE_STRIP); 
  
-                do 
-                { 
-                        // normals and vertexes come from the frame list 
-                        memcpy( point, s_lerped[order[2]], sizeof( point )  );
+				do 
+				{ 
+						// normals and vertexes come from the frame list 
+						memcpy( point, s_lerped[order[2]], sizeof( point )  );
  
 #ifdef AMIGA
 	#ifndef AMIGA_VOLATILE_ARRAYS
 			  point[0] += shadetrans[0];
 			  point[1] += shadetrans[1];
 
-                        point[0] -= shadevector[0]*(point[2]+lheight); 
-                        point[1] -= shadevector[1]*(point[2]+lheight); 
-                        point[2] = height; 
+						point[0] -= shadevector[0]*(point[2]+lheight); 
+						point[1] -= shadevector[1]*(point[2]+lheight); 
+						point[2] = height; 
 
-                        qglVertex3fv (point); 
+						qglVertex3fv (point); 
 	#else
-                        qglVertex3fv (shadowverts[order[2]]); 
+						qglVertex3fv (shadowverts[order[2]]); 
 	#endif
 #else
-                        point[0] -= shadevector[0]*(point[2]+lheight); 
-                        point[1] -= shadevector[1]*(point[2]+lheight); 
-                        point[2] = height; 
+						point[0] -= shadevector[0]*(point[2]+lheight); 
+						point[1] -= shadevector[1]*(point[2]+lheight); 
+						point[2] = height; 
 
-                        qglVertex3fv (point); 
+						qglVertex3fv (point); 
 #endif
  
-                        order += 3; 
+						order += 3; 
  
-                } while (--count); 
+				} while (--count); 
  
-                qglEnd (); 
-        }
+				qglEnd (); 
+		}
 #ifdef AMIGA
 	}        
 #endif
@@ -1471,155 +1487,155 @@ static ULONG frustum_intersect = 1; //surgeon: for gl_ext_clip_volume_hint
 */ 
 static qboolean R_CullAliasModel( vec3_t bbox[8], entity_t *e ) 
 { 
-        int i; 
-        vec3_t          mins, maxs; 
-        dmdl_t          *paliashdr; 
-        vec3_t          vectors[3]; 
-        vec3_t          thismins, oldmins, thismaxs, oldmaxs; 
-        daliasframe_t *pframe, *poldframe; 
-        vec3_t angles; 
+		int i; 
+		vec3_t          mins, maxs; 
+		dmdl_t          *paliashdr; 
+		vec3_t          vectors[3]; 
+		vec3_t          thismins, oldmins, thismaxs, oldmaxs; 
+		daliasframe_t *pframe, *poldframe; 
+		vec3_t angles; 
  
-        #ifdef AMIGA 
-        extern cvar_t *gl_ext_clip_volume_hint; //surgeon
+		#ifdef AMIGA 
+		extern cvar_t *gl_ext_clip_volume_hint; //surgeon
 
-        paliashdr = *(dmdl_t **)currentmodel->extradata; 
-        #else 
-        paliashdr = (dmdl_t *)currentmodel->extradata; 
-        #endif 
+		paliashdr = *(dmdl_t **)currentmodel->extradata; 
+		#else 
+		paliashdr = (dmdl_t *)currentmodel->extradata; 
+		#endif 
  
-        if ( ( e->frame >= paliashdr->num_frames ) || ( e->frame < 0 ) ) 
-        { 
-                ri.Con_Printf (PRINT_ALL, "R_CullAliasModel %s: no such frame %d\n",  
-                        currentmodel->name, e->frame); 
-                e->frame = 0; 
-        } 
-        if ( ( e->oldframe >= paliashdr->num_frames ) || ( e->oldframe < 0 ) ) 
-        { 
-                ri.Con_Printf (PRINT_ALL, "R_CullAliasModel %s: no such oldframe %d\n",  
-                        currentmodel->name, e->oldframe); 
-                e->oldframe = 0; 
-        } 
+		if ( ( e->frame >= paliashdr->num_frames ) || ( e->frame < 0 ) ) 
+		{ 
+				ri.Con_Printf (PRINT_ALL, "R_CullAliasModel %s: no such frame %d\n",  
+						currentmodel->name, e->frame); 
+				e->frame = 0; 
+		} 
+		if ( ( e->oldframe >= paliashdr->num_frames ) || ( e->oldframe < 0 ) ) 
+		{ 
+				ri.Con_Printf (PRINT_ALL, "R_CullAliasModel %s: no such oldframe %d\n",  
+						currentmodel->name, e->oldframe); 
+				e->oldframe = 0; 
+		} 
  
-        pframe = ( daliasframe_t * ) ( ( byte * ) paliashdr + 
-                                              paliashdr->ofs_frames + 
-                                                                          e->frame * paliashdr->framesize); 
+		pframe = ( daliasframe_t * ) ( ( byte * ) paliashdr + 
+											  paliashdr->ofs_frames + 
+																		  e->frame * paliashdr->framesize); 
  
-        poldframe = ( daliasframe_t * ) ( ( byte * ) paliashdr +  
-                                              paliashdr->ofs_frames + 
-                                                                          e->oldframe * paliashdr->framesize); 
+		poldframe = ( daliasframe_t * ) ( ( byte * ) paliashdr +  
+											  paliashdr->ofs_frames + 
+																		  e->oldframe * paliashdr->framesize); 
  
-        /* 
-        ** compute axially aligned mins and maxs 
-        */ 
-        if ( pframe == poldframe ) 
-        { 
-                for ( i = 0; i < 3; i++ ) 
-                { 
-                        mins[i] = pframe->translate[i]; 
-                        maxs[i] = mins[i] + pframe->scale[i]*255; 
-                } 
-        } 
-        else 
-        { 
-                for ( i = 0; i < 3; i++ ) 
-                { 
-                        thismins[i] = pframe->translate[i]; 
-                        thismaxs[i] = thismins[i] + pframe->scale[i]*255; 
+		/* 
+		** compute axially aligned mins and maxs 
+		*/ 
+		if ( pframe == poldframe ) 
+		{ 
+				for ( i = 0; i < 3; i++ ) 
+				{ 
+						mins[i] = pframe->translate[i]; 
+						maxs[i] = mins[i] + pframe->scale[i]*255; 
+				} 
+		} 
+		else 
+		{ 
+				for ( i = 0; i < 3; i++ ) 
+				{ 
+						thismins[i] = pframe->translate[i]; 
+						thismaxs[i] = thismins[i] + pframe->scale[i]*255; 
  
-                        oldmins[i]  = poldframe->translate[i]; 
-                        oldmaxs[i]  = oldmins[i] + poldframe->scale[i]*255; 
+						oldmins[i]  = poldframe->translate[i]; 
+						oldmaxs[i]  = oldmins[i] + poldframe->scale[i]*255; 
  
-                        if ( thismins[i] < oldmins[i] ) 
-                                mins[i] = thismins[i]; 
-                        else 
-                                mins[i] = oldmins[i]; 
+						if ( thismins[i] < oldmins[i] ) 
+								mins[i] = thismins[i]; 
+						else 
+								mins[i] = oldmins[i]; 
  
-                        if ( thismaxs[i] > oldmaxs[i] ) 
-                                maxs[i] = thismaxs[i]; 
-                        else 
-                                maxs[i] = oldmaxs[i]; 
-                } 
-        } 
+						if ( thismaxs[i] > oldmaxs[i] ) 
+								maxs[i] = thismaxs[i]; 
+						else 
+								maxs[i] = oldmaxs[i]; 
+				} 
+		} 
  
-        /* 
-        ** compute a full bounding box 
-        */ 
-        for ( i = 0; i < 8; i++ ) 
-        { 
-                vec3_t   tmp; 
+		/* 
+		** compute a full bounding box 
+		*/ 
+		for ( i = 0; i < 8; i++ ) 
+		{ 
+				vec3_t   tmp; 
  
-                if ( i & 1 ) 
-                        tmp[0] = mins[0]; 
-                else 
-                        tmp[0] = maxs[0]; 
+				if ( i & 1 ) 
+						tmp[0] = mins[0]; 
+				else 
+						tmp[0] = maxs[0]; 
  
-                if ( i & 2 ) 
-                        tmp[1] = mins[1]; 
-                else 
-                        tmp[1] = maxs[1]; 
+				if ( i & 2 ) 
+						tmp[1] = mins[1]; 
+				else 
+						tmp[1] = maxs[1]; 
  
-                if ( i & 4 ) 
-                        tmp[2] = mins[2]; 
-                else 
-                        tmp[2] = maxs[2]; 
+				if ( i & 4 ) 
+						tmp[2] = mins[2]; 
+				else 
+						tmp[2] = maxs[2]; 
  
-                VectorCopy( tmp, bbox[i] ); 
-        } 
+				VectorCopy( tmp, bbox[i] ); 
+		} 
  
-        /* 
-        ** rotate the bounding box 
-        */ 
-        VectorCopy( e->angles, angles ); 
-        angles[YAW] = -angles[YAW]; 
-        AngleVectors( angles, vectors[0], vectors[1], vectors[2] ); 
+		/* 
+		** rotate the bounding box 
+		*/ 
+		VectorCopy( e->angles, angles ); 
+		angles[YAW] = -angles[YAW]; 
+		AngleVectors( angles, vectors[0], vectors[1], vectors[2] ); 
  
-        for ( i = 0; i < 8; i++ ) 
-        { 
-                vec3_t tmp; 
+		for ( i = 0; i < 8; i++ ) 
+		{ 
+				vec3_t tmp; 
  
-                VectorCopy( bbox[i], tmp ); 
+				VectorCopy( bbox[i], tmp ); 
  
-                bbox[i][0] = DotProduct( vectors[0], tmp ); 
-                bbox[i][1] = -DotProduct( vectors[1], tmp ); 
-                bbox[i][2] = DotProduct( vectors[2], tmp ); 
+				bbox[i][0] = DotProduct( vectors[0], tmp ); 
+				bbox[i][1] = -DotProduct( vectors[1], tmp ); 
+				bbox[i][2] = DotProduct( vectors[2], tmp ); 
  
-                VectorAdd( e->origin, bbox[i], bbox[i] ); 
-        } 
+				VectorAdd( e->origin, bbox[i], bbox[i] ); 
+		} 
 
-       #ifdef AMIGA
-        if(gl_ext_clip_volume_hint->value) 
-           frustum_intersect = 0;
-       #endif
+	   #ifdef AMIGA
+		if(gl_ext_clip_volume_hint->value) 
+		   frustum_intersect = 0;
+	   #endif
  
-        { 
-                int p, f, aggregatemask = ~0; 
+		{ 
+				int p, f, aggregatemask = ~0; 
 
-                for ( p = 0; p < 8; p++ ) 
-                { 
-                        int mask = 0; 
+				for ( p = 0; p < 8; p++ ) 
+				{ 
+						int mask = 0; 
  
-                        for ( f = 0; f < 4; f++ ) 
-                        { 
-                                float dp = DotProduct( frustum[f].normal, bbox[p] ); 
+						for ( f = 0; f < 4; f++ ) 
+						{ 
+								float dp = DotProduct( frustum[f].normal, bbox[p] ); 
  
-                                if ( ( dp - frustum[f].dist ) < 0 ) 
-                                { 
-                                        mask |= ( 1 << f ); 
-                                } 
-                        }
+								if ( ( dp - frustum[f].dist ) < 0 ) 
+								{ 
+										mask |= ( 1 << f ); 
+								} 
+						}
  
  			  frustum_intersect |= mask; //surgeon
 
-                        aggregatemask &= mask; 
-                } 
+						aggregatemask &= mask; 
+				} 
  
-                if ( aggregatemask ) 
-                { 
-                        return true; 
-                } 
+				if ( aggregatemask ) 
+				{ 
+						return true; 
+				} 
  
-                return false; 
-        } 
+				return false; 
+		} 
 } 
  
 /* 
@@ -1630,213 +1646,213 @@ R_DrawAliasModel
 */ 
 void R_DrawAliasModel (entity_t *e) 
 { 
-        int                     i; 
-        dmdl_t          *paliashdr; 
-        float           an; 
-        vec3_t          bbox[8]; 
-        image_t         *skin; 
+		int                     i; 
+		dmdl_t          *paliashdr; 
+		float           an; 
+		vec3_t          bbox[8]; 
+		image_t         *skin; 
 
 #ifdef AMIGA
-        frustum_intersect = 1; //surgeon
+		frustum_intersect = 1; //surgeon
 #endif 
-        if ( !( e->flags & RF_WEAPONMODEL ) ) 
-        { 
-                if ( R_CullAliasModel( bbox, e ) ) 
-                        return; 
-        } 
+		if ( !( e->flags & RF_WEAPONMODEL ) ) 
+		{ 
+				if ( R_CullAliasModel( bbox, e ) ) 
+						return; 
+		} 
  
-        if ( e->flags & RF_WEAPONMODEL ) 
-        { 
-                if ( r_lefthand->value == 2 ) 
-                        return; 
-        } 
+		if ( e->flags & RF_WEAPONMODEL ) 
+		{ 
+				if ( r_lefthand->value == 2 ) 
+						return; 
+		} 
  
-        #ifdef AMIGA 
-        paliashdr = *(dmdl_t **)currentmodel->extradata; 
-        #else 
-        paliashdr = (dmdl_t *)currentmodel->extradata; 
-        #endif 
+		#ifdef AMIGA 
+		paliashdr = *(dmdl_t **)currentmodel->extradata; 
+		#else 
+		paliashdr = (dmdl_t *)currentmodel->extradata; 
+		#endif 
  
-        // 
-        // get lighting information 
-        // 
-        // PMM - rewrote, reordered to handle new shells & mixing 
-        // PMM - 3.20 code .. replaced with original way of doing it to keep mod authors happy 
-        // 
-        if ( currententity->flags & ( RF_SHELL_HALF_DAM | RF_SHELL_GREEN | RF_SHELL_RED | RF_SHELL_BLUE | RF_SHELL_DOUBLE ) ) 
-        { 
-                VectorClear (shadelight); 
-                if (currententity->flags & RF_SHELL_HALF_DAM) 
-                { 
-                                shadelight[0] = 0.56; 
-                                shadelight[1] = 0.59; 
-                                shadelight[2] = 0.45; 
-                } 
-                if ( currententity->flags & RF_SHELL_DOUBLE ) 
-                { 
-                        shadelight[0] = 0.9; 
-                        shadelight[1] = 0.7; 
-                } 
-                if ( currententity->flags & RF_SHELL_RED ) 
-                        shadelight[0] = 1.0; 
-                if ( currententity->flags & RF_SHELL_GREEN ) 
-                        shadelight[1] = 1.0; 
-                if ( currententity->flags & RF_SHELL_BLUE ) 
-                        shadelight[2] = 1.0; 
-        } 
+		// 
+		// get lighting information 
+		// 
+		// PMM - rewrote, reordered to handle new shells & mixing 
+		// PMM - 3.20 code .. replaced with original way of doing it to keep mod authors happy 
+		// 
+		if ( currententity->flags & ( RF_SHELL_HALF_DAM | RF_SHELL_GREEN | RF_SHELL_RED | RF_SHELL_BLUE | RF_SHELL_DOUBLE ) ) 
+		{ 
+				VectorClear (shadelight); 
+				if (currententity->flags & RF_SHELL_HALF_DAM) 
+				{ 
+								shadelight[0] = 0.56; 
+								shadelight[1] = 0.59; 
+								shadelight[2] = 0.45; 
+				} 
+				if ( currententity->flags & RF_SHELL_DOUBLE ) 
+				{ 
+						shadelight[0] = 0.9; 
+						shadelight[1] = 0.7; 
+				} 
+				if ( currententity->flags & RF_SHELL_RED ) 
+						shadelight[0] = 1.0; 
+				if ( currententity->flags & RF_SHELL_GREEN ) 
+						shadelight[1] = 1.0; 
+				if ( currententity->flags & RF_SHELL_BLUE ) 
+						shadelight[2] = 1.0; 
+		} 
 /* 
-                // PMM -special case for godmode 
-                if ( (currententity->flags & RF_SHELL_RED) && 
-                        (currententity->flags & RF_SHELL_BLUE) && 
-                        (currententity->flags & RF_SHELL_GREEN) ) 
-                { 
-                        for (i=0 ; i<3 ; i++) 
-                                shadelight[i] = 1.0; 
-                } 
-                else if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_BLUE | RF_SHELL_DOUBLE ) ) 
-                { 
-                        VectorClear (shadelight); 
+				// PMM -special case for godmode 
+				if ( (currententity->flags & RF_SHELL_RED) && 
+						(currententity->flags & RF_SHELL_BLUE) && 
+						(currententity->flags & RF_SHELL_GREEN) ) 
+				{ 
+						for (i=0 ; i<3 ; i++) 
+								shadelight[i] = 1.0; 
+				} 
+				else if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_BLUE | RF_SHELL_DOUBLE ) ) 
+				{ 
+						VectorClear (shadelight); 
  
-                        if ( currententity->flags & RF_SHELL_RED ) 
-                        { 
-                                shadelight[0] = 1.0; 
-                                if (currententity->flags & (RF_SHELL_BLUE|RF_SHELL_DOUBLE) ) 
-                                        shadelight[2] = 1.0; 
-                        } 
-                        else if ( currententity->flags & RF_SHELL_BLUE ) 
-                        { 
-                                if ( currententity->flags & RF_SHELL_DOUBLE ) 
-                                { 
-                                        shadelight[1] = 1.0; 
-                                        shadelight[2] = 1.0; 
-                                } 
-                                else 
-                                { 
-                                        shadelight[2] = 1.0; 
-                                } 
-                        } 
-                        else if ( currententity->flags & RF_SHELL_DOUBLE ) 
-                        { 
-                                shadelight[0] = 0.9; 
-                                shadelight[1] = 0.7; 
-                        } 
-                } 
-                else if ( currententity->flags & ( RF_SHELL_HALF_DAM | RF_SHELL_GREEN ) ) 
-                { 
-                        VectorClear (shadelight); 
-                        // PMM - new colors 
-                        if ( currententity->flags & RF_SHELL_HALF_DAM ) 
-                        { 
-                                shadelight[0] = 0.56; 
-                                shadelight[1] = 0.59; 
-                                shadelight[2] = 0.45; 
-                        } 
-                        if ( currententity->flags & RF_SHELL_GREEN ) 
-                        { 
-                                shadelight[1] = 1.0; 
-                        } 
-                } 
-        } 
-                        //PMM - ok, now flatten these down to range from 0 to 1.0. 
-        //              max_shell_val = max(shadelight[0], max(shadelight[1], shadelight[2])); 
-        //              if (max_shell_val > 0) 
-        //              { 
-        //                      for (i=0; i<3; i++) 
-        //                      { 
-        //                              shadelight[i] = shadelight[i] / max_shell_val; 
-        //                      } 
-        //              } 
-        // pmm 
+						if ( currententity->flags & RF_SHELL_RED ) 
+						{ 
+								shadelight[0] = 1.0; 
+								if (currententity->flags & (RF_SHELL_BLUE|RF_SHELL_DOUBLE) ) 
+										shadelight[2] = 1.0; 
+						} 
+						else if ( currententity->flags & RF_SHELL_BLUE ) 
+						{ 
+								if ( currententity->flags & RF_SHELL_DOUBLE ) 
+								{ 
+										shadelight[1] = 1.0; 
+										shadelight[2] = 1.0; 
+								} 
+								else 
+								{ 
+										shadelight[2] = 1.0; 
+								} 
+						} 
+						else if ( currententity->flags & RF_SHELL_DOUBLE ) 
+						{ 
+								shadelight[0] = 0.9; 
+								shadelight[1] = 0.7; 
+						} 
+				} 
+				else if ( currententity->flags & ( RF_SHELL_HALF_DAM | RF_SHELL_GREEN ) ) 
+				{ 
+						VectorClear (shadelight); 
+						// PMM - new colors 
+						if ( currententity->flags & RF_SHELL_HALF_DAM ) 
+						{ 
+								shadelight[0] = 0.56; 
+								shadelight[1] = 0.59; 
+								shadelight[2] = 0.45; 
+						} 
+						if ( currententity->flags & RF_SHELL_GREEN ) 
+						{ 
+								shadelight[1] = 1.0; 
+						} 
+				} 
+		} 
+						//PMM - ok, now flatten these down to range from 0 to 1.0. 
+		//              max_shell_val = max(shadelight[0], max(shadelight[1], shadelight[2])); 
+		//              if (max_shell_val > 0) 
+		//              { 
+		//                      for (i=0; i<3; i++) 
+		//                      { 
+		//                              shadelight[i] = shadelight[i] / max_shell_val; 
+		//                      } 
+		//              } 
+		// pmm 
 */ 
-        else if ( currententity->flags & RF_FULLBRIGHT ) 
-        { 
-                for (i=0 ; i<3 ; i++) 
-                        shadelight[i] = 1.0; 
-        } 
-        else 
-        { 
-                R_LightPoint (currententity->origin, shadelight); 
+		else if ( currententity->flags & RF_FULLBRIGHT ) 
+		{ 
+				for (i=0 ; i<3 ; i++) 
+						shadelight[i] = 1.0; 
+		} 
+		else 
+		{ 
+				R_LightPoint (currententity->origin, shadelight); 
  
-                // player lighting hack for communication back to server 
-                // big hack! 
-                if ( currententity->flags & RF_WEAPONMODEL ) 
-                { 
-                        // pick the greatest component, which should be the same 
-                        // as the mono value returned by software 
-                        if (shadelight[0] > shadelight[1]) 
-                        { 
-                                if (shadelight[0] > shadelight[2]) 
-                                        r_lightlevel->value = 150*shadelight[0]; 
-                                else 
-                                        r_lightlevel->value = 150*shadelight[2]; 
-                        } 
-                        else 
-                        { 
-                                if (shadelight[1] > shadelight[2]) 
-                                        r_lightlevel->value = 150*shadelight[1]; 
-                                else 
-                                        r_lightlevel->value = 150*shadelight[2]; 
-                        } 
+				// player lighting hack for communication back to server 
+				// big hack! 
+				if ( currententity->flags & RF_WEAPONMODEL ) 
+				{ 
+						// pick the greatest component, which should be the same 
+						// as the mono value returned by software 
+						if (shadelight[0] > shadelight[1]) 
+						{ 
+								if (shadelight[0] > shadelight[2]) 
+										r_lightlevel->value = 150*shadelight[0]; 
+								else 
+										r_lightlevel->value = 150*shadelight[2]; 
+						} 
+						else 
+						{ 
+								if (shadelight[1] > shadelight[2]) 
+										r_lightlevel->value = 150*shadelight[1]; 
+								else 
+										r_lightlevel->value = 150*shadelight[2]; 
+						} 
  
-                } 
-                 
-                if ( gl_monolightmap->string[0] != '0' ) 
-                { 
-                        float s = shadelight[0]; 
+				} 
+				 
+				if ( gl_monolightmap->string[0] != '0' ) 
+				{ 
+						float s = shadelight[0]; 
  
-                        if ( s < shadelight[1] ) 
-                                s = shadelight[1]; 
-                        if ( s < shadelight[2] ) 
-                                s = shadelight[2]; 
+						if ( s < shadelight[1] ) 
+								s = shadelight[1]; 
+						if ( s < shadelight[2] ) 
+								s = shadelight[2]; 
  
-                        shadelight[0] = s; 
-                        shadelight[1] = s; 
-                        shadelight[2] = s; 
-                } 
-        } 
+						shadelight[0] = s; 
+						shadelight[1] = s; 
+						shadelight[2] = s; 
+				} 
+		} 
  
-        if ( currententity->flags & RF_MINLIGHT ) 
-        { 
-                for (i=0 ; i<3 ; i++) 
-                        if (shadelight[i] > 0.1) 
-                                break; 
-                if (i == 3) 
-                { 
-                        shadelight[0] = 0.1; 
-                        shadelight[1] = 0.1; 
-                        shadelight[2] = 0.1; 
-                } 
-        } 
+		if ( currententity->flags & RF_MINLIGHT ) 
+		{ 
+				for (i=0 ; i<3 ; i++) 
+						if (shadelight[i] > 0.1) 
+								break; 
+				if (i == 3) 
+				{ 
+						shadelight[0] = 0.1; 
+						shadelight[1] = 0.1; 
+						shadelight[2] = 0.1; 
+				} 
+		} 
  
-        if ( currententity->flags & RF_GLOW ) 
-        {       // bonus items will pulse with time 
-                float   scale; 
-                float   min; 
+		if ( currententity->flags & RF_GLOW ) 
+		{       // bonus items will pulse with time 
+				float   scale; 
+				float   min; 
  
-                scale = 0.1 * sin(r_newrefdef.time*7); 
-                for (i=0 ; i<3 ; i++) 
-                { 
-                        min = shadelight[i] * 0.8; 
-                        shadelight[i] += scale; 
-                        if (shadelight[i] < min) 
-                                shadelight[i] = min; 
-                } 
-        } 
+				scale = 0.1 * sin(r_newrefdef.time*7); 
+				for (i=0 ; i<3 ; i++) 
+				{ 
+						min = shadelight[i] * 0.8; 
+						shadelight[i] += scale; 
+						if (shadelight[i] < min) 
+								shadelight[i] = min; 
+				} 
+		} 
  
 // ================= 
 // PGM  ir goggles color override 
-        if ( r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE) 
-        { 
-                shadelight[0] = 1.0; 
-                shadelight[1] = 0.0; 
-                shadelight[2] = 0.0; 
-        } 
+		if ( r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE) 
+		{ 
+				shadelight[0] = 1.0; 
+				shadelight[1] = 0.0; 
+				shadelight[2] = 0.0; 
+		} 
 // PGM   
 // ================= 
 
 #if 0 //surgeon: moved to GL_LerpVerts
 
-        shadedots = r_avertexnormal_dots[((int)(currententity->angles[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
+		shadedots = r_avertexnormal_dots[((int)(currententity->angles[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
 
 #endif
 
@@ -1844,186 +1860,186 @@ void R_DrawAliasModel (entity_t *e)
 
 	if(gl_shadows->value)
 	{         
-        an = currententity->angles[1]/180*M_PI; 
-        shadevector[0] = cos(-an); 
-        shadevector[1] = sin(-an); 
-        shadevector[2] = 1; 
-        VectorNormalize (shadevector); 
+		an = currententity->angles[1]/180*M_PI; 
+		shadevector[0] = cos(-an); 
+		shadevector[1] = sin(-an); 
+		shadevector[2] = 1; 
+		VectorNormalize (shadevector); 
  	}
 
-        // 
-        // locate the proper data 
-        // 
+		// 
+		// locate the proper data 
+		// 
  
-        c_alias_polys += paliashdr->num_tris; 
+		c_alias_polys += paliashdr->num_tris; 
  
-        // 
-        // draw all the triangles 
-        // 
-        if (currententity->flags & RF_DEPTHHACK) // hack the depth range to prevent view model from poking into walls 
-                qglDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin)); 
+		// 
+		// draw all the triangles 
+		// 
+		if (currententity->flags & RF_DEPTHHACK) // hack the depth range to prevent view model from poking into walls 
+				qglDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin)); 
  
-        if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) ) 
-        { 
-                extern void MYgluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar ); 
+		if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) ) 
+		{ 
+				extern void MYgluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar ); 
  
-                qglMatrixMode( GL_PROJECTION ); 
-                qglPushMatrix(); 
-                qglLoadIdentity(); 
-                qglScalef( -1, 1, 1 ); 
-            MYgluPerspective( r_newrefdef.fov_y, ( float ) r_newrefdef.width / r_newrefdef.height,  4,  4096); 
-                qglMatrixMode( GL_MODELVIEW ); 
+				qglMatrixMode( GL_PROJECTION ); 
+				qglPushMatrix(); 
+				qglLoadIdentity(); 
+				qglScalef( -1, 1, 1 ); 
+			MYgluPerspective( r_newrefdef.fov_y, ( float ) r_newrefdef.width / r_newrefdef.height,  4,  4096); 
+				qglMatrixMode( GL_MODELVIEW ); 
  
-                qglCullFace( GL_BACK ); 
-        } 
+				qglCullFace( GL_BACK ); 
+		} 
  
-    qglPushMatrix (); 
-        e->angles[PITCH] = -e->angles[PITCH];   // sigh. 
-        R_RotateForEntity (e); 
-        e->angles[PITCH] = -e->angles[PITCH];   // sigh. 
+	qglPushMatrix (); 
+		e->angles[PITCH] = -e->angles[PITCH];   // sigh. 
+		R_RotateForEntity (e); 
+		e->angles[PITCH] = -e->angles[PITCH];   // sigh. 
  
-        // select skin 
-        if (currententity->skin) 
-                skin = currententity->skin;     // custom player skin 
-        else 
-        { 
-                if (currententity->skinnum >= MAX_MD2SKINS) 
-                        skin = currentmodel->skins[0]; 
-                else 
-                { 
-                        skin = currentmodel->skins[currententity->skinnum]; 
-                        if (!skin) 
-                                skin = currentmodel->skins[0]; 
-                } 
-        } 
-        if (!skin) 
-                skin = r_notexture;     // fallback... 
-        GL_Bind(skin->texnum); 
+		// select skin 
+		if (currententity->skin) 
+				skin = currententity->skin;     // custom player skin 
+		else 
+		{ 
+				if (currententity->skinnum >= MAX_MD2SKINS) 
+						skin = currentmodel->skins[0]; 
+				else 
+				{ 
+						skin = currentmodel->skins[currententity->skinnum]; 
+						if (!skin) 
+								skin = currentmodel->skins[0]; 
+				} 
+		} 
+		if (!skin) 
+				skin = r_notexture;     // fallback... 
+		GL_Bind(skin->texnum); 
  
-        // draw it 
+		// draw it 
  
 #ifndef AMIGA //surgeon: state sorted - only reset if shadows are rendered
 
-        qglShadeModel (GL_SMOOTH);
+		qglShadeModel (GL_SMOOTH);
 
-        GL_TexEnv( GL_MODULATE );
+		GL_TexEnv( GL_MODULATE );
 
-        if ( currententity->flags & RF_TRANSLUCENT ) 
-        { 
-                qglEnable (GL_BLEND); 
-        } 
+		if ( currententity->flags & RF_TRANSLUCENT ) 
+		{ 
+				qglEnable (GL_BLEND); 
+		} 
 #endif 
  
-        if ( (currententity->frame >= paliashdr->num_frames)  
-                || (currententity->frame < 0) ) 
-        { 
-                ri.Con_Printf (PRINT_ALL, "R_DrawAliasModel %s: no such frame %d\n", 
-                        currentmodel->name, currententity->frame); 
-                currententity->frame = 0; 
-                currententity->oldframe = 0; 
-        } 
+		if ( (currententity->frame >= paliashdr->num_frames)  
+				|| (currententity->frame < 0) ) 
+		{ 
+				ri.Con_Printf (PRINT_ALL, "R_DrawAliasModel %s: no such frame %d\n", 
+						currentmodel->name, currententity->frame); 
+				currententity->frame = 0; 
+				currententity->oldframe = 0; 
+		} 
  
-        if ( (currententity->oldframe >= paliashdr->num_frames) 
-                || (currententity->oldframe < 0)) 
-        { 
-                ri.Con_Printf (PRINT_ALL, "R_DrawAliasModel %s: no such oldframe %d\n", 
-                        currentmodel->name, currententity->oldframe); 
-                currententity->frame = 0; 
-                currententity->oldframe = 0; 
-        } 
+		if ( (currententity->oldframe >= paliashdr->num_frames) 
+				|| (currententity->oldframe < 0)) 
+		{ 
+				ri.Con_Printf (PRINT_ALL, "R_DrawAliasModel %s: no such oldframe %d\n", 
+						currentmodel->name, currententity->oldframe); 
+				currententity->frame = 0; 
+				currententity->oldframe = 0; 
+		} 
 
 #ifdef AMIGA
-        if(frustum_intersect == 0) // turn off clip-test
-	        glHint(CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST); 
+		if(frustum_intersect == 0) // turn off clip-test
+			glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST);
 #endif
 
-        if ( !r_lerpmodels->value ) 
-                currententity->backlerp = 0; 
-        GL_DrawAliasFrameLerp (paliashdr, currententity->backlerp); 
+		if ( !r_lerpmodels->value ) 
+				currententity->backlerp = 0; 
+		GL_DrawAliasFrameLerp (paliashdr, currententity->backlerp); 
 
 #ifdef AMIGA
-        if(frustum_intersect == 0) // clip-test back on
-        {
-	        glHint(CLIP_VOLUME_CLIPPING_HINT_EXT, GL_NICEST);
-              frustum_intersect = 1;
-        }
+		if(frustum_intersect == 0) // clip-test back on
+		{
+			glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_NICEST);
+			  frustum_intersect = 1;
+		}
 #endif
 
  
 #ifndef AMIGA
-        GL_TexEnv( GL_REPLACE ); 
-        qglShadeModel (GL_FLAT); 
+		GL_TexEnv( GL_REPLACE ); 
+		qglShadeModel (GL_FLAT); 
 #endif
  
-        qglPopMatrix (); 
+		qglPopMatrix (); 
  
 #if 0 
-        qglDisable( GL_CULL_FACE ); 
-        qglPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); 
-        qglDisable( GL_TEXTURE_2D ); 
-        qglBegin( GL_TRIANGLE_STRIP ); 
-        for ( i = 0; i < 8; i++ ) 
-        { 
-                qglVertex3fv( bbox[i] ); 
-        } 
-        qglEnd(); 
-        qglEnable( GL_TEXTURE_2D ); 
-        qglPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); 
-        qglEnable( GL_CULL_FACE ); 
+		qglDisable( GL_CULL_FACE ); 
+		qglPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); 
+		qglDisable( GL_TEXTURE_2D ); 
+		qglBegin( GL_TRIANGLE_STRIP ); 
+		for ( i = 0; i < 8; i++ ) 
+		{ 
+				qglVertex3fv( bbox[i] ); 
+		} 
+		qglEnd(); 
+		qglEnable( GL_TEXTURE_2D ); 
+		qglPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); 
+		qglEnable( GL_CULL_FACE ); 
 #endif 
  
-        if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) ) 
-        { 
-                qglMatrixMode( GL_PROJECTION ); 
-                qglPopMatrix(); 
-                qglMatrixMode( GL_MODELVIEW ); 
-                qglCullFace( GL_FRONT ); 
-        } 
+		if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) ) 
+		{ 
+				qglMatrixMode( GL_PROJECTION ); 
+				qglPopMatrix(); 
+				qglMatrixMode( GL_MODELVIEW ); 
+				qglCullFace( GL_FRONT ); 
+		} 
 
 #ifndef AMIGA //moved because of state-sorting 
-        if ( currententity->flags & RF_TRANSLUCENT ) 
-        { 
-                qglDisable (GL_BLEND); 
-        } 
+		if ( currententity->flags & RF_TRANSLUCENT ) 
+		{ 
+				qglDisable (GL_BLEND); 
+		} 
 #endif
 
-        if (currententity->flags & RF_DEPTHHACK) 
-                qglDepthRange (gldepthmin, gldepthmax); 
+		if (currententity->flags & RF_DEPTHHACK) 
+				qglDepthRange (gldepthmin, gldepthmax); 
  
 #if 1 
-        if (gl_shadows->value && !(currententity->flags & (RF_TRANSLUCENT | RF_WEAPONMODEL))) 
-        { 
+		if (gl_shadows->value && !(currententity->flags & (RF_TRANSLUCENT | RF_WEAPONMODEL))) 
+		{ 
 #ifdef AMIGA
-        //GL_TexEnv( GL_REPLACE ); 
+		//GL_TexEnv( GL_REPLACE ); 
 
-        if(gl_smoothmodels->value)
-        qglShadeModel (GL_FLAT); 
+		if(gl_smoothmodels->value)
+		qglShadeModel (GL_FLAT); 
 #endif
-                qglPushMatrix ();
+				qglPushMatrix ();
  
-                R_RotateForEntity (e);
+				R_RotateForEntity (e);
  
-                qglDisable (GL_TEXTURE_2D); 
-                qglEnable (GL_BLEND);
+				qglDisable (GL_TEXTURE_2D); 
+				qglEnable (GL_BLEND);
  
-                qglColor4f (0,0,0,0.5);
+				qglColor4f (0,0,0,0.5);
 
-                GL_DrawAliasShadow (paliashdr, currententity->frame );
+				GL_DrawAliasShadow (paliashdr, currententity->frame );
  
-                qglEnable (GL_TEXTURE_2D); 
-                qglDisable (GL_BLEND);
+				qglEnable (GL_TEXTURE_2D); 
+				qglDisable (GL_BLEND);
 
-                qglPopMatrix (); 
+				qglPopMatrix (); 
 
 #ifdef AMIGA //reset texenv and shademodel to default
-        if(gl_smoothmodels->value)
-        qglShadeModel (GL_SMOOTH);
+		if(gl_smoothmodels->value)
+		qglShadeModel (GL_SMOOTH);
 
-        //GL_TexEnv( GL_MODULATE );
+		//GL_TexEnv( GL_MODULATE );
 #endif 
-        } 
+		} 
 #endif 
-        qglColor4f (1,1,1,1); 
+		qglColor4f (1,1,1,1); 
 } 
  
  

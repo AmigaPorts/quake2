@@ -21,7 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 
 #ifdef AMIGA
+#ifndef __amigaos4__
 #include "dll.h"
+#endif
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <dos/dosextens.h>
@@ -78,6 +80,10 @@ cvar_t  *flood_persecond;
 cvar_t  *flood_waitdelay;
 
 cvar_t  *sv_maplist;
+
+#ifdef AMIGA
+ULONG SegList;
+#endif
 
 void SpawnEntities (char *mapname, char *entities, char *spawnpoint);
 void ClientThink (edict_t *ent, usercmd_t *cmd);
@@ -141,6 +147,18 @@ game_export_t *GetGameAPI (game_import_t *import)
 	globals.ServerCommand = ServerCommand;
 
 	globals.edict_size = sizeof(edict_t);
+
+#ifdef __amigaos4__
+	{
+		struct CommandLineInterface *pCLI = Cli();
+		if (! pCLI)
+		{
+			return NULL;
+		}
+
+		SegList = (ULONG)(pCLI->cli_Module);
+	}
+#endif
 
 	return &globals;
 }
@@ -449,51 +467,54 @@ void G_RunFrame (void)
 
 #ifdef AMIGA
 
+#ifndef __amigaos4__
+
 void* dllFindResource(int id, char *pType)
 {
-    return NULL;
+	return NULL;
 }
 
 void* dllLoadResource(void *pHandle)
 {
-    return NULL;
+	return NULL;
 }
 
 void dllFreeResource(void *pHandle)
 {
-    return;
+	return;
 }
 
-ULONG SegList;
 
 dll_tExportSymbol DLL_ExportSymbols[] =
 {
-    {dllFindResource, "dllFindResource"},
-    {dllLoadResource, "dllLoadResource"},
-    {dllFreeResource, "dllFreeResource"},
-    {(void *)GetGameAPI, "GetGameAPI"},
-    {0,0}
+	{dllFindResource, "dllFindResource"},
+	{dllLoadResource, "dllLoadResource"},
+	{dllFreeResource, "dllFreeResource"},
+	{(void *)GetGameAPI, "GetGameAPI"},
+	{0,0}
 };
 
 dll_tImportSymbol DLL_ImportSymbols[] =
 {
-    {0,0,0,0}
+	{0,0,0,0}
 };
 
 int DLL_Init(void)
 {
-    struct CommandLineInterface *pCLI = Cli();
+	struct CommandLineInterface *pCLI = Cli();
 
-    if (!pCLI)      // Who the f*ck started us ?
+	if (!pCLI)      // Who the f*ck started us ?
 	return 0;
 
-    SegList = (ULONG)(pCLI->cli_Module);
+	SegList = (ULONG)(pCLI->cli_Module);
 
-    return 1;
+	return 1;
 }
 
 void DLL_DeInit(void)
 {
 }
-
 #endif /* AMIGA */
+
+#endif
+

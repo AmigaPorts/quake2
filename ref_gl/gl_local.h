@@ -39,10 +39,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/ref.h" 
  
 #include "qgl.h"
+
+#ifndef __amigaos4__
 #ifdef AMIGA
 #include "qgl_MiniGL.h"
 #endif
-
+#endif
  
 #include "renderercache.h" 
  

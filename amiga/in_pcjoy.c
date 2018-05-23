@@ -28,8 +28,8 @@ cvar_t  *in_joystick;
 cvar_t  *pc_deadzone;
 cvar_t  *pc_joyspeed;
 
-#include <clib/WesSupport_protos.h>
-
+//#include "WesSupport_protos.h"
+/*
 struct Library *WesSupportBase;
 int WesStick;
 struct WES_JoyData wes_joydata;
@@ -44,7 +44,7 @@ struct JoyStickDesc
 
 static struct JoyStickDesc tj;
 
-   
+
 void IN_ShutdownPC(void)
 { 
 	if (WesSupportBase)
@@ -325,3 +325,5 @@ void IN_InitPC()
  		pc_joyspeed							= Cvar_Get ("pc_joyspeed","2",CVAR_ARCHIVE);
  }
 }
+
+*/

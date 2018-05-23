@@ -1,9 +1,14 @@
 #include "../client/client.h"
-#include "dll.h"
+//#include "dll.h"
 
 #include <intuition/screens.h>
 #include <intuition/intuition.h>
 #include <proto/intuition.h>
+
+#ifdef __amigaos4__
+extern struct Window *GetWindowHandle(void);
+refexport_t GetRefAPI (refimport_t rimp );
+#endif
 
 // Structure containing functions exported from refresh DLL
 refexport_t     re;
@@ -96,7 +101,7 @@ Map from rawkey to quake keynums
 */
 int MapKey (int key)
 {
-    return scantokey[key];
+	return scantokey[key];
 }
 
 /*
@@ -167,13 +172,18 @@ void VID_NewWindow ( int width, int height)
 
 void VID_FreeReflib (void)
 {
+#ifndef __amigaos4__
 	dllFreeLibrary( reflib_library);
 	memset (&re, 0, sizeof(re));
 	reflib_library = NULL;
+#endif
 	reflib_active  = false;
 }
 
+#ifndef __amigaos4__
 struct Window * (*GetWindowHandle)(void);
+#endif
+
 struct MsgPort *g_pMessagePort;
 
 /*
@@ -184,7 +194,10 @@ VID_LoadRefresh
 qboolean VID_LoadRefresh( char *name )
 {
 	refimport_t     ri;
+
+#ifndef __amigaos4__
 	GetRefAPI_t     GetRefAPI;
+#endif
 
 	if ( reflib_active )
 	{
@@ -192,6 +205,7 @@ qboolean VID_LoadRefresh( char *name )
 		VID_FreeReflib ();
 	}
 
+#ifndef __amigaos4__
 	Com_Printf( "------- Loading %s -------\n", name );
 
 	if ( ( reflib_library = dllLoadLibrary( name, name ) ) == 0 )
@@ -201,6 +215,7 @@ qboolean VID_LoadRefresh( char *name )
 		return false;
 	}
 	Com_Printf("... loaded %s\n", name);
+#endif
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -219,23 +234,29 @@ qboolean VID_LoadRefresh( char *name )
 	ri.Vid_MenuInit = VID_MenuInit;
 	ri.Vid_NewWindow = VID_NewWindow;
 
+#ifndef __amigaos4__
 	if ( ( GetRefAPI = (void *) dllGetProcAddress( reflib_library, "GetRefAPI" ) ) == 0 )
 		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
 
 	if ( ( GetWindowHandle = (void *) dllGetProcAddress(reflib_library, "GetWindowHandle")) == 0)
 	    Com_Error ( ERR_FATAL, "GetProcAddress(GetWindowHandle) failed on %s", name);
+#endif
 
 	re = GetRefAPI( ri );
 
+#ifndef __amigaos4__
 	if (re.api_version != API_VERSION)
 	{
 		VID_FreeReflib ();
 		Com_Error (ERR_FATAL, "%s has incompatible api_version", name);
 	}
+#endif
+
 	if ( re.Init( 0, 0 ) == -1 )
 	{
 		re.Shutdown();
 		VID_FreeReflib ();
+		reflib_active = false;
 		return false;
 	}
 
@@ -262,7 +283,7 @@ qboolean VID_LoadRefresh( char *name )
 	if(vid_ref)
 	{
 		if(!strcmp(vid_ref->string,"glnolru")) vidref_val = 2;
-    else if(!strcmp (vid_ref->string, "gl"))
+	else if(!strcmp (vid_ref->string, "gl"))
 			vidref_val = VIDREF_GL;
 		else if(!strcmp(vid_ref->string, "soft"))
 			vidref_val = VIDREF_SOFT;
@@ -284,16 +305,16 @@ update the rendering DLL and/or video mode to match.
 */
 void VID_CheckChanges (void)
 {
-    extern void SND_CheckChanges(void);
-    char name[100];
+	extern void SND_CheckChanges(void);
+	char name[100];
 
-    if ( vid_ref->modified )
-    {
+	if ( vid_ref->modified )
+	{
 	cl.force_refdef = true;         // can't use a paused refdef
 	S_StopAllSounds();
-    }
-    while (vid_ref->modified)
-    {
+	}
+	while (vid_ref->modified)
+	{
 	/*
 	** refresh has changed
 	*/
@@ -318,10 +339,10 @@ void VID_CheckChanges (void)
 	    }
 	}
 	cls.disable_screen = false;
-    }
+	}
 
-    // Check for a change in the sound dll
-    SND_CheckChanges();
+	// Check for a change in the sound dll
+	SND_CheckChanges();
 }
 
 /*
