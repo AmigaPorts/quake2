@@ -1,0 +1,14 @@
+SUBDIRS = . ref_soft ref_gl game snd_paula snd_ahi snd_null ctf
+MAKEOPTS = --no-print-directory
+
+all:    bin install
+
+bin:
+	set -e; for i in $(SUBDIRS); do $(MAKE) $(MAKEOPTS) -C $$i -f makefile.amiga; done
+
+clean:
+	set -e; for i in $(SUBDIRS); do $(MAKE) $(MAKEOPTS) -C $$i -f makefile.amiga clean; done
+
+install:
+	set -e; for i in $(SUBDIRS); do $(MAKE) $(MAKEOPTS) -C $$i -f makefile.amiga install; done
+

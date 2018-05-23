@@ -1,0 +1,842 @@
+Storm Shell Project (0018)
+Settings (Start)
+C/C++ Environment
+"StormC:include"
+0
+"work:Q2/current/recent/game"
+0
+"work:Q2/current/recent/amiga"
+0
+"work:Q2/current/recent"
+0
+Includepath (End)
+0 "" 80
+1 "objects_debug"
+1 0 "makelog.txt"
+""
+0
+0 0
+0
+0 0
+C/C++ Preprozessor
+0 "NDEBUG" ""
+0
+Defines (End)
+1 1 1
+0 0
+C/C++ Options
+0 0 0 2 1 0 0 0 1 0 0 0 0 0 0
+0 0 0
+0
+0 1 0
+C/C++ Optimizer
+9
+C/C++ Warnings
+1 1 1 1 1 1 0 1
+0 0
+GCC Options (1)
+0 "NDEBUG" ""
+0
+1 "QUAKE2" ""
+0
+1 "QUAKE2_STATIC" ""
+0
+Defines (End)
+1 0 0 1 0
+1 0 0 0 0 1 0
+0 2 1 0 0
+0 0 1 0 1 0 0
+4 0 0 0
+0 ""
+3 0 1 0
+1 0 0 1 0 1 0 1 0 1
+1 1 0 1 0 1
+0 1 1 1 1 0 0
+1 0 0 0 0
+Assembler
+0 ""
+0 "CON://640/200/Storm Assembler/AUTO/WAIT/SCREEN StormScreen"
+0 0
+0 1 60 0 1 0 0 20 0
+Sets (End)
+0 1 0 0 0 2 1 0 0
+1 1 1 1 0 0 0 0 0
+1 0
+0 0 0 0 0
+Linker
+0 0 "PROGDIR:startup.o" 0 0 1 0 1 0 0
+"StormC:lib/" 0 "StormC:lib/logfile" 0 0 0
+0 "_WizardSurface"
+0 0 50 0 50 0 50 0 0
+0 0 0 0 0 0 0 0
+Run
+30 "" "" "" 0
+""
+
+1 "CON://400/180/Storm Console/AUTO/WAIT/SCREEN StormScreen" "RAM:Output" "RAM:Input"
+1 0
+0 0 0 "" ""
+Settings (End)
+Storm Shell Project (Custom Sections End)
+Section
+26 1 110
+0 0 1 0
+9
+File
+26 "Work:q2/quake2_68k/Quake2_68k.qiq"
+"Quake2_68k.qiq"
+"Work:q2/quake2_68k/Quake2_68k.qiq"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+1 1 100
+0 1 1 0
+4
+File
+1 "g_ai.c"
+"g_ai.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_ai.o" "objects_debug/g_ai.debug"
+""
+1 1
+File
+1 "g_chase.c"
+"g_chase.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_chase.o" "objects_debug/g_chase.debug"
+""
+1 1
+File
+1 "g_cmds.c"
+"g_cmds.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_player.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_cmds.o" "objects_debug/g_cmds.debug"
+""
+1 1
+File
+1 "g_combat.c"
+"g_combat.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_combat.o" "objects_debug/g_combat.debug"
+""
+1 1
+File
+1 "g_func.c"
+"g_func.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_func.o" "objects_debug/g_func.debug"
+""
+1 1
+File
+1 "g_items.c"
+"g_items.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_items.o" "objects_debug/g_items.debug"
+""
+1 1
+File
+1 "g_main.c"
+"g_main.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_main.o" "objects_debug/g_main.debug"
+""
+1 1
+File
+1 "g_misc.c"
+"g_misc.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_misc.o" "objects_debug/g_misc.debug"
+""
+1 1
+File
+1 "g_monster.c"
+"g_monster.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_monster.o" "objects_debug/g_monster.debug"
+""
+1 1
+File
+1 "g_phys.c"
+"g_phys.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_phys.o" "objects_debug/g_phys.debug"
+""
+1 1
+File
+1 "g_save.c"
+"g_save.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_save.o" "objects_debug/g_save.debug"
+""
+1 1
+File
+1 "g_spawn.c"
+"g_spawn.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_spawn.o" "objects_debug/g_spawn.debug"
+""
+1 1
+File
+1 "g_svcmds.c"
+"g_svcmds.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_svcmds.o" "objects_debug/g_svcmds.debug"
+""
+1 1
+File
+1 "g_target.c"
+"g_target.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_target.o" "objects_debug/g_target.debug"
+""
+1 1
+File
+1 "g_trigger.c"
+"g_trigger.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_trigger.o" "objects_debug/g_trigger.debug"
+""
+1 1
+File
+1 "g_turret.c"
+"g_turret.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_turret.o" "objects_debug/g_turret.debug"
+""
+1 1
+File
+1 "g_utils.c"
+"g_utils.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_utils.o" "objects_debug/g_utils.debug"
+""
+1 1
+File
+1 "g_weapon.c"
+"g_weapon.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/g_weapon.o" "objects_debug/g_weapon.debug"
+""
+1 1
+File
+1 "m_actor.c"
+"m_actor.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_actor.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_actor.o" "objects_debug/m_actor.debug"
+""
+1 1
+File
+1 "m_berserk.c"
+"m_berserk.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_berserk.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_berserk.o" "objects_debug/m_berserk.debug"
+""
+1 1
+File
+1 "m_boss2.c"
+"m_boss2.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_boss2.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_boss2.o" "objects_debug/m_boss2.debug"
+""
+1 1
+File
+1 "m_boss3.c"
+"m_boss3.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_boss32.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_boss3.o" "objects_debug/m_boss3.debug"
+""
+1 1
+File
+1 "m_boss31.c"
+"m_boss31.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_boss31.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_boss31.o" "objects_debug/m_boss31.debug"
+""
+1 1
+File
+1 "m_boss32.c"
+"m_boss32.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_boss32.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_boss32.o" "objects_debug/m_boss32.debug"
+""
+1 1
+File
+1 "m_brain.c"
+"m_brain.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_brain.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_brain.o" "objects_debug/m_brain.debug"
+""
+1 1
+File
+1 "m_chick.c"
+"m_chick.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_chick.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_chick.o" "objects_debug/m_chick.debug"
+""
+1 1
+File
+1 "m_flash.c"
+"m_flash.c"
+"q_shared.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_flash.o" "objects_debug/m_flash.debug"
+""
+1 1
+File
+1 "m_flipper.c"
+"m_flipper.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_flipper.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_flipper.o" "objects_debug/m_flipper.debug"
+""
+1 1
+File
+1 "m_float.c"
+"m_float.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_float.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_float.o" "objects_debug/m_float.debug"
+""
+1 1
+File
+1 "m_flyer.c"
+"m_flyer.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_flyer.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_flyer.o" "objects_debug/m_flyer.debug"
+""
+1 1
+File
+1 "m_gladiator.c"
+"m_gladiator.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_gladiator.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_gladiator.o" "objects_debug/m_gladiator.debug"
+""
+1 1
+File
+1 "m_gunner.c"
+"m_gunner.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_gunner.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_gunner.o" "objects_debug/m_gunner.debug"
+""
+1 1
+File
+1 "m_hover.c"
+"m_hover.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_hover.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_hover.o" "objects_debug/m_hover.debug"
+""
+1 1
+File
+1 "m_infantry.c"
+"m_infantry.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_infantry.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_infantry.o" "objects_debug/m_infantry.debug"
+""
+1 1
+File
+1 "m_insane.c"
+"m_insane.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_insane.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_insane.o" "objects_debug/m_insane.debug"
+""
+1 1
+File
+1 "m_medic.c"
+"m_medic.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_medic.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_medic.o" "objects_debug/m_medic.debug"
+""
+1 1
+File
+1 "m_move.c"
+"m_move.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_move.o" "objects_debug/m_move.debug"
+""
+1 1
+File
+1 "m_mutant.c"
+"m_mutant.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_mutant.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_mutant.o" "objects_debug/m_mutant.debug"
+""
+1 1
+File
+1 "m_parasite.c"
+"m_parasite.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_parasite.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_parasite.o" "objects_debug/m_parasite.debug"
+""
+1 1
+File
+1 "m_soldier.c"
+"m_soldier.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_soldier.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_soldier.o" "objects_debug/m_soldier.debug"
+""
+1 1
+File
+1 "m_supertank.c"
+"m_supertank.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_supertank.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_supertank.o" "objects_debug/m_supertank.debug"
+""
+1 1
+File
+1 "m_tank.c"
+"m_tank.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_tank.h"
+Storm Shell Project (Dependencies)
+"objects_debug/m_tank.o" "objects_debug/m_tank.debug"
+""
+1 1
+File
+1 "p_client.c"
+"p_client.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_player.h"
+Storm Shell Project (Dependencies)
+"objects_debug/p_client.o" "objects_debug/p_client.debug"
+""
+1 1
+File
+1 "p_hud.c"
+"p_hud.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/p_hud.o" "objects_debug/p_hud.debug"
+""
+1 1
+File
+1 "p_trail.c"
+"p_trail.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"objects_debug/p_trail.o" "objects_debug/p_trail.debug"
+""
+1 1
+File
+1 "p_view.c"
+"p_view.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_player.h"
+Storm Shell Project (Dependencies)
+"objects_debug/p_view.o" "objects_debug/p_view.debug"
+""
+1 1
+File
+1 "p_weapon.c"
+"p_weapon.c"
+"g_local.h"
+"q_shared.h"
+"game.h"
+"m_player.h"
+Storm Shell Project (Dependencies)
+"objects_debug/p_weapon.o" "objects_debug/p_weapon.debug"
+""
+1 1
+File
+1 "q_shared.c"
+"q_shared.c"
+"q_shared.h"
+Storm Shell Project (Dependencies)
+"objects_debug/q_shared.o" "objects_debug/q_shared.debug"
+""
+1 1
+Section
+2 1 95
+0 1 1 0
+2
+File
+2 "g_local.h"
+"g_local.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "q_shared.h"
+"q_shared.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "game.h"
+"game.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_player.h"
+"m_player.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_actor.h"
+"m_actor.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_berserk.h"
+"m_berserk.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_boss2.h"
+"m_boss2.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_boss32.h"
+"m_boss32.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_boss31.h"
+"m_boss31.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_brain.h"
+"m_brain.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_chick.h"
+"m_chick.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_flipper.h"
+"m_flipper.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_float.h"
+"m_float.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_flyer.h"
+"m_flyer.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_gladiator.h"
+"m_gladiator.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_gunner.h"
+"m_gunner.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_hover.h"
+"m_hover.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_infantry.h"
+"m_infantry.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_insane.h"
+"m_insane.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_medic.h"
+"m_medic.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_mutant.h"
+"m_mutant.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_parasite.h"
+"m_parasite.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_soldier.h"
+"m_soldier.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_supertank.h"
+"m_supertank.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "m_tank.h"
+"m_tank.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+10 1 40
+0 0 0 0
+7
+File
+10 "Work:q2/quake2/baseq2/game68k.dll"
+"Work:q2/quake2/baseq2/game68k.dll"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+5 1 -50
+0 0 0 0
+7
+File
+5 "gcclibnix040.lib"
+"gcclibnix040.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "storm.lib"
+"storm.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "amiga.lib"
+"amiga.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "debug.lib"
+"debug.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "mgl040.lib"
+"mgl040.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "dll.lib"
+"dll.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "storm020.lib"
+"storm020.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Storm Shell Project (End)

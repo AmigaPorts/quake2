@@ -1,0 +1,506 @@
+Storm Shell Project (0018)
+Settings (Start)
+C/C++ Environment
+"StormC:include"
+0
+"ide:quake2/qcommon"
+0
+"ide:quake2/game"
+0
+"ide:quake2/client"
+0
+"ide:quake2/amiga"
+0
+"ide:quake2"
+0
+"ide:quake2/ref_soft"
+0
+Includepath (End)
+0 "" 80
+1 "objects_debug"
+1 0 "makelog.txt"
+""
+0
+0 0
+0
+0 0
+C/C++ Preprozessor
+0 "NDEBUG" ""
+0
+Defines (End)
+1 1 1
+0 0
+C/C++ Options
+0 0 0 2 1 0 0 0 1 0 0 0 0 0 0
+0 0 0
+0
+0 1 0
+C/C++ Optimizer
+9
+C/C++ Warnings
+1 1 1 1 1 1 0 1
+0 0
+GCC Options (1)
+0 "NDEBUG" ""
+0
+1 "QUAKE2" ""
+0
+1 "QUAKE2_STATIC" ""
+0
+1 "IMAGECACHE" ""
+0
+1 "STORM" ""
+0
+Defines (End)
+1 0 0 1 0
+1 0 0 0 0 1 0
+0 2 1 0 0
+0 0 1 0 1 0 0
+4 0 0 0
+0 ""
+3 0 1 0
+1 0 0 1 0 1 0 1 0 1
+1 1 0 1 0 1
+0 1 1 1 1 0 0
+1 0 0 0 0
+Assembler
+0 ""
+0 "CON://640/200/Storm Assembler/AUTO/WAIT/SCREEN StormScreen"
+0 0
+0 1 60 0 1 0 0 20 0
+Sets (End)
+0 1 0 0 0 2 1 0 0
+1 1 1 1 0 0 0 0 0
+1 0
+0 0 0 0 0
+Linker
+0 0 "PROGDIR:startup.o" 0 0 1 0 1 0 0
+"StormC:lib/" 0 "StormC:lib/logfile" 0 0 0
+0 "_WizardSurface"
+0 0 50 0 50 0 50 0 0
+0 0 0 0 0 0 0 0
+Run
+30 "" "" "" 0
+""
+
+1 "CON://400/180/Storm Console/AUTO/WAIT/SCREEN StormScreen" "RAM:Output" "RAM:Input"
+1 0
+0 0 0 "" ""
+Settings (End)
+Storm Shell Project (Custom Sections End)
+Section
+26 1 110
+0 0 1 0
+9
+File
+26 "Work:q2/quake2_68k/Quake2_68k.qiq"
+"Quake2_68k.qiq"
+"Work:q2/quake2_68k/Quake2_68k.qiq"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+1 1 100
+0 1 1 0
+4
+File
+1 "gl_draw.c"
+"gl_draw.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_draw.o" "objects_debug/gl_draw.debug"
+""
+1 1
+File
+1 "gl_image.c"
+"gl_image.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_image.o" "objects_debug/gl_image.debug"
+""
+1 1
+File
+1 "gl_light.c"
+"gl_light.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_light.o" "objects_debug/gl_light.debug"
+""
+1 1
+File
+1 "gl_mesh.c"
+"gl_mesh.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"anorms.h"
+"anormtab.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_mesh.o" "objects_debug/gl_mesh.debug"
+""
+1 1
+File
+1 "gl_model.c"
+"gl_model.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_model.o" "objects_debug/gl_model.debug"
+""
+1 1
+File
+1 "gl_rmain.c"
+"gl_rmain.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_rmain.o" "objects_debug/gl_rmain.debug"
+""
+1 1
+File
+1 "gl_rmisc.c"
+"gl_rmisc.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_rmisc.o" "objects_debug/gl_rmisc.debug"
+""
+1 1
+File
+1 "gl_rsurf.c"
+"gl_rsurf.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_rsurf.o" "objects_debug/gl_rsurf.debug"
+""
+1 1
+File
+1 "gl_warp.c"
+"gl_warp.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"warpsin.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gl_warp.o" "objects_debug/gl_warp.debug"
+""
+1 1
+File
+1 "ide:quake2/amiga/qgl_amiga.c"
+"/amiga/qgl_amiga.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"qgl_MiniGL.h"
+"gl_model.h"
+Storm Shell Project (Dependencies)
+"objects_debug/qgl_amiga.o" "objects_debug/qgl_amiga.debug"
+""
+1 1
+File
+1 "ide:quake2/amiga/gla_imp.c"
+"/amiga/gla_imp.c"
+"gl_local.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"qgl.h"
+"gl_model.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"objects_debug/gla_imp.o" "objects_debug/gla_imp.debug"
+""
+1 1
+File
+1 "ide:quake2/amiga/q_shamiga.c"
+"/amiga/q_shamiga.c"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+Storm Shell Project (Dependencies)
+"objects_debug/q_shamiga.o" "objects_debug/q_shamiga.debug"
+""
+1 1
+File
+1 "ide:quake2/game/q_shared.c"
+"/game/q_shared.c"
+"/game/q_shared.h"
+Storm Shell Project (Dependencies)
+"objects_debug/q_shared.o" "objects_debug/q_shared.debug"
+""
+1 1
+File
+1 "ide:quake2/amiga/renderercache.c"
+"/amiga/renderercache.c"
+"/amiga/renderercache.h"
+"/client/ref.h"
+"/qcommon/qcommon.h"
+"/game/q_shared.h"
+"/qcommon/qfiles.h"
+"/ref_soft/r_model.h"
+Storm Shell Project (Dependencies)
+"objects_debug/renderercache.o" "objects_debug/renderercache.debug"
+""
+1 1
+Section
+2 1 95
+0 1 1 0
+2
+File
+2 "gl_local.h"
+"gl_local.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "Work:q2_68k/quake2/client/ref.h"
+"Work:q2_68k/quake2/client/ref.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "Work:q2_68k/quake2/qcommon/qcommon.h"
+"Work:q2_68k/quake2/qcommon/qcommon.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "Work:q2_68k/quake2/game/q_shared.h"
+"Work:q2_68k/quake2/game/q_shared.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "Work:q2_68k/quake2/qcommon/qfiles.h"
+"Work:q2_68k/quake2/qcommon/qfiles.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "qgl.h"
+"qgl.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "gl_model.h"
+"gl_model.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "anorms.h"
+"anorms.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "anormtab.h"
+"anormtab.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "warpsin.h"
+"warpsin.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "IDE:quake2/client/ref.h"
+"IDE:quake2/client/ref.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "IDE:quake2/qcommon/qcommon.h"
+"IDE:quake2/qcommon/qcommon.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "IDE:quake2/game/q_shared.h"
+"IDE:quake2/game/q_shared.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "IDE:quake2/qcommon/qfiles.h"
+"IDE:quake2/qcommon/qfiles.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "work:q2_68k/quake2/amiga//ref_gl/gl_local.h"
+"work:q2_68k/quake2/amiga//ref_gl/gl_local.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "work:q2_68k/quake2/amiga//ref_gl/qgl.h"
+"work:q2_68k/quake2/amiga//ref_gl/qgl.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "work:q2_68k/quake2/amiga//ref_gl/gl_model.h"
+"work:q2_68k/quake2/amiga//ref_gl/gl_model.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "IDE:quake2/amiga/renderercache.h"
+"IDE:quake2/amiga/renderercache.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "IDE:quake2/ref_soft/r_model.h"
+"IDE:quake2/ref_soft/r_model.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "qgl_MiniGL.h"
+"qgl_MiniGL.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+10 1 40
+0 0 0 0
+7
+File
+10 "work:Q2/quake2/ref_gl.dll_68k"
+"work:Q2/quake2/ref_gl.dll_68k"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+5 1 -50
+0 0 0 0
+7
+File
+5 "storm.lib"
+"storm.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "amiga.lib"
+"amiga.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "debug.lib"
+"debug.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "dll.lib"
+"dll.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "warp3d.lib"
+"warp3d.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "mgl060.lib"
+"mgl060.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Storm Shell Project (End)
