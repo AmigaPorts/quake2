@@ -21,11 +21,3 @@ partition:
 5) Start Games:Quake2/Quake2
 
 Note: the binary has a "stack cookie" set to 1000000 bytes.
-
-## Support
-
-Please don't bug Hyperion Entertainment about this port. If you encounter problems, you may write to me:
-
-juha.niemimaki@gmail.com
-
-Have fun and please send feedback if it works / does not work!
